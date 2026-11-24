@@ -54,11 +54,17 @@ td{padding:9px 8px;border-top:1px solid var(--line)}
 .sbar{height:8px;border-radius:9px;background:var(--mist);min-width:70px}.sbar i{display:block;height:100%;border-radius:9px;background:var(--blue)}
 .tw{overflow-x:auto}
 /* history */
-.day{border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:10px}
-.dh{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px}.dh b{color:var(--blue)}
-.it{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line);flex-wrap:wrap}
-.it .s{font-weight:700;min-width:90px}.it .n{flex:1;color:var(--soft);font-size:12.5px;min-width:100px}
-.pill{background:var(--mist);border-radius:99px;padding:3px 10px;font-size:12.5px}
+.day-card{border:1px solid var(--line);border-radius:18px;padding:0;margin-bottom:14px;overflow:hidden;background:#fff}
+.day-header{padding:14px;background:#f8fbff;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}
+.day-header b{color:var(--blue);font-size:15px}
+.day-body{padding:14px}
+.subject-item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px dashed var(--line)}
+.subject-item:last-child{border-bottom:0}
+.subject-item .info{display:flex;flex-direction:column;gap:3px}
+.subject-item .title{font-weight:700;color:var(--navy)}
+.subject-item .desc{font-size:12px;color:var(--soft)}
+.actions{display:flex;gap:6px}
+.pill{background:var(--mist);border-radius:99px;padding:4px 10px;font-size:12px;color:var(--blue)}
 .row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:12px}
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:11px 18px;border-radius:14px;font-size:13.5px;z-index:9}
 @media(prefers-reduced-motion:no-preference){.card{animation:up .3s ease-out}@keyframes up{from{opacity:.4;transform:translateY(6px)}}}
@@ -90,13 +96,9 @@ body{width:100%;overflow-x:hidden;padding:14px 10px 32px}
 .row{grid-template-columns:minmax(0,1fr)!important}
 input,select{max-width:100%;min-width:0}
 #goal{width:82px!important}
-.it{align-items:stretch}
-.it .s{min-width:0;width:100%}
-.it .n{min-width:0;width:100%;overflow-wrap:anywhere}
-.it .btn{flex:1;min-width:0}
 .tw{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
 table{min-width:620px}
-.day{overflow:hidden}
+.day-card{overflow:hidden}
 @media(max-width:420px){
   body{padding:10px 8px 28px}
   .card{padding:13px;border-radius:18px}
@@ -109,7 +111,6 @@ table{min-width:620px}
   .chh .seg{width:100%}
   .chh .seg button{flex:1}
 }
-
 </style>
 </head>
 <body>
@@ -182,11 +183,6 @@ table{min-width:620px}
 <script>
 /* ===== تنظیمات سوپابیس ===== */
 const CFG = {url: 'https://gmqttymxiaaqhfvvzxhe.supabase.co', key: 'sb_publishable_tq5cNQcDJaJfl2pgfH6r6g_LbB0HVuM'};
-
-/* 
-  آدرس دقیق Edge Function شما بر اساس تصویری که فرستادید.
-  اگر آدرس تابع را عوض کردید، این خط را هم تغییر دهید.
-*/
 const EDGE_FUNCTION_URL = 'https://gmqttymxiaaqhfvvzxhe.supabase.co/functions/v1/rapid-endpoint';
 
 const DEFAULT_SUBJECTS = ['ریاضی', 'فیزیک', 'شیمی', 'زیست', 'ادبیات', 'عربی', 'دین و زندگی', 'زبان انگلیسی'];
@@ -264,7 +260,7 @@ function updateClock(){const h=Math.floor(timerSec/3600),m=Math.floor(timerSec%3
 function timerStart(){if(timerRunning)return;timerRunning=true;timerInt=setInterval(()=>{timerSec++;updateClock()},1000)}
 function timerPause(){timerRunning=false;clearInterval(timerInt);timerInt=null}
 function timerReset(){timerPause();timerSec=0;updateClock()}
-async function timerStop(){timerPause();if(timerSec<60){toast('حداقل یک دقیقه مطالعه لازم است');return}const row={day:TODAY,subject:$('#ts').value.trim()||'مطالعه',minutes:Math.floor(timerSec/60),tests:0,note:packNote('',{topic:$('#tp').value.trim(),correct:0,wrong:0,blank:0})};if(!sb){toast(SETUP_ERR);return}const {data,error}=await sb.from('study_logs').insert(row).select().single();if(error){toast('ثبت تایمر ناموفق بود');return}const telegramOk = await notify({action:'insert',id:data.id}); toast(telegramOk ? 'زمان مطالعه ثبت شد و به تلگرام ارسال شد' : 'زمان مطالعه ثبت شد؛ ارسال تلگرام ناموفق بود'); timerReset(); await load()}
+async function timerStop(){timerPause();if(timerSec<60){toast('حداقل یک دقیقه مطالعه لازم است');return}const row={day:TODAY,subject:$('#ts').value.trim()||'مطالعه',minutes:Math.floor(timerSec/60),tests:0,note:packNote('',{topic:$('#tp').value.trim(),correct:0,wrong:0,blank:0})};if(!sb){toast(SETUP_ERR);return}const {data,error}=await sb.from('study_logs').insert(row).select().single();if(error){toast('ثبت تایمر ناموفق بود');return}const telegramOk = await notify({action:'insert', day:row.day}); toast(telegramOk ? 'زمان مطالعه ثبت شد و به تلگرام ارسال شد' : 'زمان مطالعه ثبت شد؛ ارسال تلگرام ناموفق بود'); timerReset(); await load()}
 /* ===== رندر ===== */
 function render() {
   const D = byDay(); 
@@ -289,7 +285,37 @@ function subjects() {
 }
 function history(D) {
   const ks = Object.keys(D).sort().reverse();
-  $('#days').innerHTML = ks.map(k => {const d = D[k]; return `<div class="day"><div class="dh"><b>${jl(k)}</b><span><span class="pill">${tm(d.m)}</span> <span class="pill">${fa(d.t)} تست</span></span></div>${d.items.map(r => `<div class="it"><span class="s">${esc(r.subject)}</span><span class="pill">${tm(r.minutes)}</span><span class="pill">${fa(r.tests)} تست</span><span class="n">${esc((metaOf(r).topic?metaOf(r).topic+' — ':'')+cleanNote(r))}</span><button class="btn ghost sm" data-e="${r.id}">ویرایش</button><button class="btn del sm" data-d="${r.id}">حذف</button></div>`).join('')}</div>`}).join('') || '<p class="muted">تاریخچه‌ات پس از اولین گزارش اینجا ساخته می‌شود.</p>';
+  $('#days').innerHTML = ks.map(k => {
+    const d = D[k]; 
+    return `<div class="day-card">
+      <div class="day-header">
+        <b>${jl(k)}</b>
+        <div style="display:flex; gap:8px">
+          <span class="pill">${tm(d.m)}</span>
+          <span class="pill">${fa(d.t)} تست</span>
+        </div>
+      </div>
+      <div class="day-body">
+        ${d.items.map(r => `
+          <div class="subject-item">
+            <div class="info">
+              <span class="title">${esc(r.subject)}</span>
+              <span class="desc">${esc((metaOf(r).topic?metaOf(r).topic+' — ':'')+cleanNote(r))}</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px">
+              <div style="text-align:left">
+                <div class="mini">${tm(r.minutes)} | ${fa(r.tests)} تست</div>
+              </div>
+              <div class="actions">
+                <button class="btn ghost sm" data-e="${r.id}">ویرایش</button>
+                <button class="btn del sm" data-d="${r.id}">حذف</button>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }).join('') || '<p class="muted">تاریخچه‌ات پس از اولین گزارش اینجا ساخته می‌شود.</p>';
 }
 
 /* ===== ناوبری ===== */
@@ -311,7 +337,7 @@ $('#days').onclick = async e => {
   if (dl) {
     if (!sb) return; const r = LOGS.find(x => x.id === dl.dataset.d); if (!confirm('گزارش «' + r.subject + '» حذف شود؟')) return;
     const {error} = await sb.from('study_logs').delete().eq('id', r.id); if (error) return toast('حذف نشد');
-    const telegramOk = await notify({action: 'delete', day: r.day, subject: r.subject, minutes: r.minutes, tests: r.tests}); toast(telegramOk ? 'حذف شد و به تلگرام اطلاع داده شد' : 'حذف شد؛ اطلاع تلگرام ناموفق بود'); load();
+    const telegramOk = await notify({action: 'delete', day: r.day}); toast(telegramOk ? 'حذف شد و به تلگرام اطلاع داده شد' : 'حذف شد؛ اطلاع تلگرام ناموفق بود'); load();
   }
 };
 $('#f').onsubmit = async e => {
@@ -328,7 +354,8 @@ $('#f').onsubmit = async e => {
     $('#ferr').textContent = 'ذخیره نشد: ' + error.message;
     return;
   }
-  const telegramOk = await notify({action: EDIT ? 'update' : 'insert', id: data.id}); toast(EDIT ? (telegramOk ? 'تغییرات ذخیره شد و به تلگرام ارسال شد' : 'تغییرات ذخیره شد؛ ارسال تلگرام ناموفق بود') : (telegramOk ? 'گزارش ثبت شد و به تلگرام ارسال شد' : 'گزارش ثبت شد؛ ارسال تلگرام ناموفق بود'));
+  const telegramOk = await notify({action: EDIT ? 'update' : 'insert', day: row.day});
+  toast(EDIT ? (telegramOk ? 'تغییرات ذخیره شد و به تلگرام ارسال شد' : 'تغییرات ذخیره شد؛ ارسال تلگرام ناموفق بود') : (telegramOk ? 'گزارش ثبت شد و به تلگرام ارسال شد' : 'گزارش ثبت شد؛ ارسال تلگرام ناموفق بود'));
   const wasEdit = !!EDIT, d = row.day; resetForm(); $('#fd').value = d; await load(); if (wasEdit) view('hist');
 };
 $('#planForm').onsubmit=e=>{e.preventDefault();PLANS.push({day:$('#pd').value,time:$('#pt').value,subject:$('#ps').value.trim(),topic:$('#pp').value.trim(),minutes:+$('#pm').value||60,done:false});savePlans();e.target.reset();$('#pd').value=TODAY;toast('به برنامه اضافه شد')};
@@ -336,11 +363,10 @@ $('#plans').onclick=e=>{const b=e.target.closest('[data-plan]');if(!b)return;con
 $('#clearPlans').onclick=()=>{PLANS=PLANS.filter(x=>!x.done);savePlans();toast('برنامه‌های انجام‌شده پاک شدند')};
 $('#copyWeekly').onclick=()=>{navigator.clipboard?.writeText(window._weeklyText||'').then(()=>toast('گزارش کپی شد')).catch(()=>toast('کپی خودکار در این مرورگر در دسترس نیست'))}; $('#startTimer').onclick=timerStart; $('#pauseTimer').onclick=timerPause; $('#resetTimer').onclick=timerReset; $('#stopTimer').onclick=timerStop; updateClock();
 
-/* پیام تلگرام: از طریق Edge Function — آدرس دقیق تابع در بالای کد تنظیم شده است */
+/* پیام تلگرام */
 async function notify(body) {
   if (!sb) return false;
   try {
-    // ارسال درخواست به آدرس دقیق و کامل تابع شما
     const res = await fetch(EDGE_FUNCTION_URL, {
       method: 'POST',
       headers: {
@@ -351,7 +377,6 @@ async function notify(body) {
       body: JSON.stringify(body)
     });
     
-    // بررسی پاسخ
     if (!res.ok) {
       console.error('Function returned error:', res.status, await res.text());
       return false;
