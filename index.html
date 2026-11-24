@@ -121,6 +121,8 @@ table{min-width:620px}
 
   <!-- داشبورد -->
   <section id="dash">
+    <!-- تگ گمشده stats اینجا اضافه شد -->
+    <div class="card"><div class="stats" id="stats"></div></div>
     <div class="card"><h3>امروز</h3><div class="today-grid" id="todayGrid"></div></div>
     <div class="card"><div class="chh"><h3>هدف‌ها</h3><span class="muted">اهداف در مرورگر ذخیره می‌شوند</span></div><div class="goalrow"><label class="f">هدف مطالعه روزانه (دقیقه)<input id="goal" type="number" min="30" max="1440" style="width:150px"></label><label class="f">هدف تست روزانه<input id="testGoal" type="number" min="1" max="5000" style="width:150px"></label><label class="f">هدف مطالعه هفتگی (دقیقه)<input id="weekGoal" type="number" min="60" max="10080" style="width:150px"></label><label class="f">هدف مطالعه ماهانه (دقیقه)<input id="monthGoal" type="number" min="120" max="44640" style="width:150px"></label></div></div>
     <div class="card"><h3>تحلیل هوشمند</h3><div id="insights"></div></div><div class="card"><div class="chh"><h3>گزارش هفتگی</h3><button class="btn ghost sm" id="copyWeekly" type="button">کپی گزارش</button></div><div id="weeklyReport"></div></div>
@@ -260,7 +262,9 @@ function timerReset(){timerPause();timerSec=0;updateClock()}
 async function timerStop(){timerPause();if(timerSec<60){toast('حداقل یک دقیقه مطالعه لازم است');return}const row={day:TODAY,subject:$('#ts').value.trim()||'مطالعه',minutes:Math.floor(timerSec/60),tests:0,note:packNote('',{topic:$('#tp').value.trim(),correct:0,wrong:0,blank:0})};if(!sb){toast(SETUP_ERR);return}const {data,error}=await sb.from('study_logs').insert(row).select().single();if(error){toast('ثبت تایمر ناموفق بود');return}const telegramOk = await notify({action:'insert',id:data.id}); toast(telegramOk ? 'زمان مطالعه ثبت شد و به تلگرام ارسال شد' : 'زمان مطالعه ثبت شد؛ ارسال تلگرام ناموفق بود'); timerReset(); await load()}
 /* ===== رندر ===== */
 function render() {
-  const D = byDay(); $('#stats').innerHTML = statCards(D); $('#hstats').innerHTML = statCards(D);
+  const D = byDay(); 
+  if ($('#stats')) $('#stats').innerHTML = statCards(D); 
+  if ($('#hstats')) $('#hstats').innerHTML = statCards(D);
   $('#sl').innerHTML = [...new Set([...DEFAULT_SUBJECTS, ...LOGS.map(r => r.subject)])].map(s => `<option value="${esc(s)}">`).join('');
   chart(D); subjects(); history(D); renderToday(D); renderInsights(D); renderBadges(D); renderWeekly(D); plansRender();
 }
@@ -314,7 +318,11 @@ $('#f').onsubmit = async e => {
   $('#fb').disabled = true;
   const q = EDIT ? sb.from('study_logs').update(row).eq('id', EDIT.id).select().single() : sb.from('study_logs').insert(row).select().single();
   const {data, error} = await q; $('#fb').disabled = false;
-  if (error) {$('#ferr').textContent = 'ذخیره نشد؛ اتصال اینترنت و تنظیمات سوپابیس را بررسی کن.'; return}
+  if (error) {
+    console.error("Supabase Error:", error);
+    $('#ferr').textContent = 'ذخیره نشد: ' + error.message;
+    return;
+  }
   const telegramOk = await notify({action: EDIT ? 'update' : 'insert', id: data.id}); toast(EDIT ? (telegramOk ? 'تغییرات ذخیره شد و به تلگرام ارسال شد' : 'تغییرات ذخیره شد؛ ارسال تلگرام ناموفق بود') : (telegramOk ? 'گزارش ثبت شد و به تلگرام ارسال شد' : 'گزارش ثبت شد؛ ارسال تلگرام ناموفق بود'));
   const wasEdit = !!EDIT, d = row.day; resetForm(); $('#fd').value = d; await load(); if (wasEdit) view('hist');
 };
