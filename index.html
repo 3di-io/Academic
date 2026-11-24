@@ -138,25 +138,26 @@ table{min-width:620px}
     <div class="card"><h3>آمار هر درس</h3><div class="tw" id="subj"></div></div>
   </section>
 
-  <!-- ثبت -->
+  <!-- ثبت گروهی -->
   <section id="add" class="hide">
     <form class="card" id="f">
-      <h3 id="ft">گزارش جدید</h3>
+      <h3 id="ft">ثبت گزارش روز</h3>
       <div class="row">
         <label class="f">تاریخ<input type="date" id="fd" required></label>
-        <label class="f">درس<input id="fs" list="sl" placeholder="مثلاً ریاضی" maxlength="40" required><datalist id="sl"></datalist></label>
-        <label class="f">مبحث<input id="fp" maxlength="60" placeholder="مثلاً تابع"></label>
       </div>
-      <div class="row">
-        <label class="f">مطالعه (ساعت)<input id="fh" type="number" min="0" max="24" value="0"></label>
-        <label class="f">مطالعه (دقیقه)<input id="fm" type="number" min="0" max="59" value="0"></label>
-        <label class="f">تعداد تست<input id="ft2" type="number" min="0" max="2000" value="0"></label>
+      
+      <div style="background:var(--mist); border-radius:14px; padding:12px; margin-bottom:16px;">
+        <h4 style="font-size:13.5px; margin-bottom:10px; color:var(--blue)">لیست دروس</h4>
+        <div id="subjectsList"></div>
+        <button type="button" class="btn ghost sm" id="addSubjectRow" style="margin-top:10px; width:100%">+ افزودن درس جدید</button>
       </div>
-      <div class="test-grid" style="margin-bottom:12px"><label class="f">درست<input id="fcorr" type="number" min="0" max="2000" value="0"></label><label class="f">غلط<input id="fwrong" type="number" min="0" max="2000" value="0"></label><label class="f">نزده<input id="fblank" type="number" min="0" max="2000" value="0"></label></div>
-      <label class="f" style="margin-bottom:12px">یادداشت (اختیاری)<input id="fn" maxlength="200" placeholder="مبحث، اشتباهات، حس و حال…"></label>
+
       <div class="err" id="ferr" role="alert"></div>
-      <div style="display:flex;gap:8px"><button class="btn" id="fb">ثبت گزارش</button><button type="button" class="btn ghost hide" id="fc">انصراف</button></div>
-      <p class="muted" style="margin-top:10px">برای چند درس در یک روز، هر درس را جدا ثبت کن. پس از ثبت، پیام کوتاهی در تلگرام می‌آید.</p>
+      <div style="display:flex;gap:8px">
+        <button class="btn" id="fb" type="submit" style="flex:1">ثبت کل گزارش</button>
+        <button type="button" class="btn ghost hide" id="fc" style="flex:1">انصراف</button>
+      </div>
+      <p class="muted" style="margin-top:10px">پس از ثبت، پیام کوتاهی در تلگرام می‌آید.</p>
     </form>
   </section>
 
@@ -212,6 +213,7 @@ const jShort = k => new Intl.DateTimeFormat('fa-IR-u-ca-persian', {month: 'numer
 const tm = m => { const h = Math.floor(m / 60), r = m % 60; return h ? fa(h) + ' ساعت' + (r ? ' و ' + fa(r) + ' دقیقه' : '') : fa(r) + ' دقیقه' };
 let LOGS = [], RNG = 14, EDIT = null, tt; let timerSec=0,timerInt=null,timerRunning=false;
 let PLANS=JSON.parse(localStorage.getItem('studyPlans')||'[]');
+let FORM_ROWS = []; // آرایه‌ای برای نگهداری دروس در فرم ثبت
 
 function toast(t) {const e = $('#toast'); e.textContent = t; e.classList.remove('hide'); clearTimeout(tt); tt = setTimeout(() => e.classList.add('hide'), 2600)}
 
@@ -219,6 +221,7 @@ function toast(t) {const e = $('#toast'); e.textContent = t; e.classList.remove(
 async function start() {
   $('#today').textContent = jl(TODAY); $('#fd').value = TODAY; $('#fd').max = TODAY;
   const g=goals(); $('#goal').value=g.day; $('#testGoal').value=g.tests; $('#weekGoal').value=g.week; $('#monthGoal').value=g.month; $('#pd').value=TODAY; $('#fd').max = TODAY;
+  resetForm(); // فرم ثبت را آماده می‌کنیم
   await load();
 }
 async function load() {
@@ -318,6 +321,31 @@ function history(D) {
   }).join('') || '<p class="muted">تاریخچه‌ات پس از اولین گزارش اینجا ساخته می‌شود.</p>';
 }
 
+/* ===== فرم ثبت گروهی (دروس) ===== */
+function renderFormRows() {
+  $('#subjectsList').innerHTML = FORM_ROWS.map((r, i) => `
+    <div class="subject-row" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap:8px; margin-bottom:8px; align-items:center; background:#fff; padding:8px; border-radius:10px;">
+      <input placeholder="درس" value="${esc(r.subject)}" oninput="FORM_ROWS[${i}].subject=this.value" style="padding:8px">
+      <input placeholder="مبحث" value="${esc(r.topic)}" oninput="FORM_ROWS[${i}].topic=this.value" style="padding:8px">
+      <input type="number" placeholder="دقیقه" value="${r.minutes}" oninput="FORM_ROWS[${i}].minutes=+this.value" style="padding:8px">
+      <input type="number" placeholder="تست" value="${r.tests}" oninput="FORM_ROWS[${i}].tests=+this.value" style="padding:8px">
+      <button type="button" class="btn del sm" onclick="removeFormRow(${i})">✕</button>
+    </div>
+  `).join('');
+}
+window.removeFormRow = (i) => { FORM_ROWS.splice(i, 1); renderFormRows(); };
+window.addFormRow = () => { FORM_ROWS.push({ subject: '', topic: '', minutes: 60, tests: 0 }); renderFormRows(); };
+
+function resetForm() {
+  EDIT = null; FORM_ROWS = [{ subject: '', topic: '', minutes: 60, tests: 0 }];
+  $('#fd').value = TODAY; $('#ferr').textContent = '';
+  $('#ft').textContent = 'ثبت گزارش روز'; $('#fb').textContent = 'ثبت کل گزارش';
+  $('#fc').classList.add('hide');
+  renderFormRows();
+}
+
+$('#addSubjectRow').onclick = addFormRow;
+
 /* ===== ناوبری ===== */
 function view(v) {$$('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); ['dash', 'add', 'plan', 'timer', 'hist'].forEach(x => $('#' + x).classList.toggle('hide', x !== v)); scrollTo(0, 0)}
 $('#tabs').onclick = e => {const b = e.target.closest('button'); if (b) {if (b.dataset.v !== 'add') resetForm(); view(b.dataset.v)}};
@@ -325,14 +353,13 @@ $('#rng').onclick = e => {const b = e.target.closest('button'); if (!b) return; 
 $('#goal').onchange = () => {localStorage.setItem('goal', $('#goal').value); chart(byDay()); renderToday(byDay()); renderInsights(byDay())}; $('#testGoal').onchange=()=>{localStorage.setItem('testGoal',$('#testGoal').value);renderToday(byDay())}; $('#weekGoal').onchange=()=>{localStorage.setItem('weekGoal',$('#weekGoal').value);renderToday(byDay());renderInsights(byDay())}; $('#monthGoal').onchange=()=>localStorage.setItem('monthGoal',$('#monthGoal').value);
 
 /* ===== ثبت و ویرایش ===== */
-function resetForm() {EDIT = null; $('#f').reset(); $('#fd').value = TODAY; $('#fp').value=''; $('#fcorr').value=0; $('#fwrong').value=0; $('#fblank').value=0; $('#ft').textContent = 'گزارش جدید'; $('#fb').textContent = 'ثبت گزارش'; $('#fc').classList.add('hide'); $('#ferr').textContent = ''}
 $('#fc').onclick = () => {resetForm(); view('hist')};
 $('#days').onclick = async e => {
   const ed = e.target.closest('[data-e]'), dl = e.target.closest('[data-d]');
   if (ed) {
     const r = LOGS.find(x => x.id === ed.dataset.e); EDIT = r;
-    const mm=metaOf(r); $('#fd').value = r.day; $('#fs').value = r.subject; $('#fp').value = mm.topic||''; $('#fh').value = Math.floor(r.minutes / 60); $('#fm').value = r.minutes % 60; $('#ft2').value = r.tests; $('#fcorr').value=mm.correct||0; $('#fwrong').value=mm.wrong||0; $('#fblank').value=mm.blank||0; $('#fn').value = cleanNote(r) || '';
-    $('#ft').textContent = 'ویرایش گزارش'; $('#fb').textContent = 'ذخیره‌ی تغییرات'; $('#fc').classList.remove('hide'); view('add');
+    FORM_ROWS = [{ subject: r.subject, topic: metaOf(r).topic||'', minutes: r.minutes, tests: r.tests }];
+    $('#fd').value = r.day; $('#ft').textContent = 'ویرایش گزارش'; $('#fb').textContent = 'ذخیره‌ی تغییرات'; $('#fc').classList.remove('hide'); renderFormRows(); view('add');
   }
   if (dl) {
     if (!sb) return; const r = LOGS.find(x => x.id === dl.dataset.d); if (!confirm('گزارش «' + r.subject + '» حذف شود؟')) return;
@@ -342,21 +369,44 @@ $('#days').onclick = async e => {
 };
 $('#f').onsubmit = async e => {
   e.preventDefault(); $('#ferr').textContent = '';
-  const minutes = (+$('#fh').value || 0) * 60 + (+$('#fm').value || 0), tests = +$('#ft2').value || 0; const correct=+$('#fcorr').value||0, wrong=+$('#fwrong').value||0, blank=+$('#fblank').value||0; if(correct+wrong+blank>tests){$('#ferr').textContent='مجموع درست، غلط و نزده نمی‌تواند بیشتر از تعداد تست باشد.';return}
-  if (!minutes && !tests) {$('#ferr').textContent = 'حداقل یکی از زمان مطالعه یا تعداد تست را وارد کن.'; return}
-  const row = {day: $('#fd').value, subject: $('#fs').value.trim(), minutes, tests, note: packNote($('#fn').value.trim(), {topic:$('#fp').value.trim(),correct,wrong,blank})};
+  if (FORM_ROWS.length === 0) { $('#ferr').textContent = 'حداقل یک درس اضافه کنید.'; return; }
+  
+  const day = $('#fd').value;
+  const rows = FORM_ROWS.map(r => ({
+    day: day,
+    subject: r.subject.trim() || 'ناشناخته',
+    minutes: r.minutes || 0,
+    tests: r.tests || 0,
+    note: packNote('', {topic: r.topic.trim(), correct:0, wrong:0, blank:0})
+  }));
+
+  if (rows.every(r => r.minutes === 0 && r.tests === 0)) {
+    $('#ferr').textContent = 'حداقل زمان یا تست یک درس باید بیشتر از 0 باشد.'; return;
+  }
+
   if (!sb) {$('#ferr').textContent = SETUP_ERR; return}
   $('#fb').disabled = true;
-  const q = EDIT ? sb.from('study_logs').update(row).eq('id', EDIT.id).select().single() : sb.from('study_logs').insert(row).select().single();
-  const {data, error} = await q; $('#fb').disabled = false;
-  if (error) {
-    console.error("Supabase Error:", error);
-    $('#ferr').textContent = 'ذخیره نشد: ' + error.message;
+
+  let errorMsg = '';
+  if (EDIT) {
+    // اگر در حال ویرایش هستیم، رکورد قبلی را آپدیت می‌کنیم
+    const {error} = await sb.from('study_logs').update(rows[0]).eq('id', EDIT.id);
+    if (error) errorMsg = error.message;
+  } else {
+    // ثبت چندتایی (تمام دروس با هم)
+    const {error} = await sb.from('study_logs').insert(rows);
+    if (error) errorMsg = error.message;
+  }
+  
+  $('#fb').disabled = false;
+  if (errorMsg) {
+    $('#ferr').textContent = 'ذخیره نشد: ' + errorMsg;
     return;
   }
-  const telegramOk = await notify({action: EDIT ? 'update' : 'insert', day: row.day});
+
+  const telegramOk = await notify({action: EDIT ? 'update' : 'insert', day: day});
   toast(EDIT ? (telegramOk ? 'تغییرات ذخیره شد و به تلگرام ارسال شد' : 'تغییرات ذخیره شد؛ ارسال تلگرام ناموفق بود') : (telegramOk ? 'گزارش ثبت شد و به تلگرام ارسال شد' : 'گزارش ثبت شد؛ ارسال تلگرام ناموفق بود'));
-  const wasEdit = !!EDIT, d = row.day; resetForm(); $('#fd').value = d; await load(); if (wasEdit) view('hist');
+  const wasEdit = !!EDIT; resetForm(); $('#fd').value = day; await load(); if (wasEdit) view('hist');
 };
 $('#planForm').onsubmit=e=>{e.preventDefault();PLANS.push({day:$('#pd').value,time:$('#pt').value,subject:$('#ps').value.trim(),topic:$('#pp').value.trim(),minutes:+$('#pm').value||60,done:false});savePlans();e.target.reset();$('#pd').value=TODAY;toast('به برنامه اضافه شد')};
 $('#plans').onclick=e=>{const b=e.target.closest('[data-plan]');if(!b)return;const i=+b.dataset.plan;PLANS[i].done=!PLANS[i].done;savePlans()};
