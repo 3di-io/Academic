@@ -21,7 +21,7 @@ h1{font-size:20px}h3{font-size:15px;color:var(--blue);margin-bottom:12px}
 input,select{font:inherit;color:var(--navy);padding:12px 14px;border:1px solid var(--steel);border-radius:14px;background:#fff;width:100%;outline:none}
 input:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(157,183,213,.55)}
 label.f{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--soft)}
-.btn{font:inherit;font-weight:700;border:0;border-radius:14px;padding:12px 20px;background:var(--blue);color:#fff;cursor:pointer;text-align:center;}
+.btn{font:inherit;font-weight:700;border:0;border-radius:14px;padding:12px 20px;background:var(--blue);color:#fff;cursor:pointer}
 .btn.ghost{background:var(--mist);color:var(--blue);font-weight:500}.btn.sm{padding:7px 12px;font-size:12.5px;border-radius:10px}.btn.del{background:#fbeaea;color:var(--bad)}
 .btn:disabled{opacity:.6}
 .err{color:var(--bad);font-size:13px;min-height:18px}
@@ -40,6 +40,13 @@ label.f{display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
 @media(max-width:720px){.g2{grid-template-columns:1fr}}
 .chh{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap}.chh .seg{padding:3px}.chh .seg button{padding:5px 11px;font-size:12.5px}
+/* bar chart */
+.bars{height:170px;display:flex;align-items:flex-end;gap:3px;position:relative;border-bottom:1px solid var(--line);padding-top:6px}
+.bar{flex:1;min-width:0;height:100%;display:flex;align-items:flex-end}
+.bar i{display:block;width:100%;background:var(--steel);border-radius:6px 6px 0 0;min-height:0}
+.bar.on i{background:var(--blue)}.bar.top i{background:var(--ok)}
+.goal{position:absolute;right:0;left:0;border-top:2px dashed var(--bad);opacity:.6;pointer-events:none}
+.xl{display:flex;gap:3px;margin-top:4px}.xl span{flex:1;font-size:10px;color:var(--soft);text-align:center;white-space:nowrap;overflow:visible;min-width:0}
 /* table */
 table{width:100%;border-collapse:collapse;font-size:13.5px}
 th{font-size:12px;color:var(--soft);font-weight:500;text-align:right;padding:6px 8px}
@@ -63,29 +70,7 @@ td{padding:9px 8px;border-top:1px solid var(--line)}
 @media(prefers-reduced-motion:no-preference){.card{animation:up .3s ease-out}@keyframes up{from{opacity:.4;transform:translateY(6px)}}}
 
 /* v2 enhancements */
-.today-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.today-box{background:var(--mist);border-radius:18px;padding:14px}.today-box b{font-size:21px;display:block;margin:4px 0}.progress{height:9px;background:#d9e7f5;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:var(--blue);border-radius:99px}.goalrow{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.goalrow label{flex:1;min-width:150px}.mini{font-size:11px;color:var(--soft)}.badget{display:inline-flex;align-items:center;gap:5px;background:var(--mist);padding:7px 10px;border-radius:12px;font-size:12px}.badges{display:flex;gap:8px;flex-wrap:wrap}.timer{font-variant-numeric:tabular-nums;font-size:48px;font-weight:800;text-align:center;letter-spacing:1px;margin:14px 0;color:var(--blue)}.timer-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.plan-item{display:grid;grid-template-columns:90px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}.plan-item.done{opacity:.55;text-decoration:line-through}.insight{border-right:4px solid var(--blue);background:var(--mist);padding:10px 12px;border-radius:12px;margin:7px 0;font-size:13px}.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.test-grid label{min-width:0}.accuracy{font-weight:800;color:var(--blue)}
-
-/* Custom Form Rows for Mobile & Desktop */
-.subject-row{display:grid; grid-template-columns:1fr 1fr auto auto auto; gap:8px; margin-bottom:10px; align-items:center; background:#fff; padding:10px; border-radius:12px; border:1px solid var(--line);}
-@media(max-width:600px){.subject-row{grid-template-columns:1fr 1fr; grid-template-areas: "s s" "t t" "m d a";}}
-.sr-s{grid-area:s;} .sr-t{grid-area:t;} .sr-m{grid-area:m;} .sr-d{grid-area:d;} .sr-a{grid-area:a;}
-.num-group{display:flex; flex-direction:column; align-items:center; justify-content:center; background:var(--mist); border-radius:10px; padding:4px; min-width:80px;}
-.num-group label{font-size:11px; color:var(--blue); margin-bottom:2px; font-weight:700;}
-.num-group .num-input{display:flex; align-items:center; gap:4px; width:100%; justify-content:space-between;}
-.num-group input{width:100%; text-align:center; border:0; background:transparent; padding:0; font-size:16px; font-weight:700; color:var(--navy); -moz-appearance:textfield;}
-.num-group input::-webkit-outer-spin-button, .num-group input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-
-/* New Chart Style (Image Like) */
-.chart-row{display:flex; gap:8px; align-items:flex-end; height:180px; padding-top:20px; padding-bottom:10px;}
-.chart-col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; position:relative;}
-.chart-bar{width:80%; max-width:40px; border-radius:99px; transition:height 0.4s ease; min-height:4px; position:relative;}
-.chart-bar.empty{background:repeating-linear-gradient(45deg, #e2e8f0, #e2e8f0 4px, #f8fafc 4px, #f8fafc 8px); border:1px solid #cbd5e1;}
-.chart-bar.active{background:var(--ok);} /* Green */
-.chart-bar.top{background:#0d5c38;} /* Dark Green */
-.chart-bar.today{box-shadow:0 0 0 2px var(--blue);}
-.chart-label{margin-top:8px; font-size:11px; color:var(--soft); font-weight:700;}
-.chart-val{position:absolute; top:-24px; font-size:11px; background:var(--navy); color:#fff; padding:2px 6px; border-radius:6px; font-weight:700; opacity:0; transition:opacity 0.2s; pointer-events:none; white-space:nowrap;}
-.chart-col:hover .chart-val{opacity:1;}
+.today-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px}.today-box{background:var(--mist);border-radius:18px;padding:14px}.today-box b{font-size:21px;display:block;margin:4px 0}.progress{height:9px;background:#d9e7f5;border-radius:99px;overflow:hidden}.progress i{display:block;height:100%;background:var(--blue);border-radius:99px}.goalrow{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.goalrow label{flex:1;min-width:150px}.mini{font-size:11px;color:var(--soft)}.badget{display:inline-flex;align-items:center;gap:5px;background:var(--mist);padding:7px 10px;border-radius:12px;font-size:12px}.badges{display:flex;gap:8px;flex-wrap:wrap}.timer{font-variant-numeric:tabular-nums;font-size:48px;font-weight:800;text-align:center;letter-spacing:1px;margin:14px 0;color:var(--blue)}.timer-actions{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}.plan-item{display:grid;grid-template-columns:90px 1fr auto;gap:10px;align-items:center;padding:10px 0;border-top:1px solid var(--line)}.plan-item.done{opacity:.55;text-decoration:line-through}.insight{border-right:4px solid var(--blue);background:var(--mist);padding:10px 12px;border-radius:12px;margin:7px 0;font-size:13px}.test-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.test-grid label{min-width:0}.accuracy{font-weight:800;color:var(--blue)}.heat{display:grid;grid-template-columns:repeat(14,1fr);gap:4px}.heat i{aspect-ratio:1;border-radius:4px;background:var(--mist);display:block}.heat i.l1{background:#bfd5eb}.heat i.l2{background:#7ea7d0}.heat i.l3{background:#3f72a8}.heat i.l4{background:var(--blue)}@media(max-width:560px){.plan-item{grid-template-columns:65px 1fr auto}.timer{font-size:38px}.test-grid{grid-template-columns:1fr}}
 
 /* ===== mobile fit fixes ===== */
 html{width:100%;overflow-x:hidden}
@@ -106,6 +91,8 @@ body{width:100%;overflow-x:hidden;padding:14px 10px 32px}
 .chh h3,.chh>b{min-width:0}
 .chh .seg{max-width:100%;overflow-x:auto}
 .chh .seg button{white-space:nowrap}
+.bars{width:100%;overflow:hidden}
+.xl{width:100%;overflow:hidden}
 .row{grid-template-columns:minmax(0,1fr)!important}
 input,select{max-width:100%;min-width:0}
 #goal{width:82px!important}
@@ -140,17 +127,14 @@ table{min-width:620px}
     <div class="card"><div class="chh"><h3>هدف‌ها</h3><span class="muted">اهداف در مرورگر ذخیره می‌شوند</span></div><div class="goalrow"><label class="f">هدف مطالعه روزانه (دقیقه)<input id="goal" type="number" min="30" max="1440" style="width:150px"></label><label class="f">هدف تست روزانه<input id="testGoal" type="number" min="1" max="5000" style="width:150px"></label><label class="f">هدف مطالعه هفتگی (دقیقه)<input id="weekGoal" type="number" min="60" max="10080" style="width:150px"></label><label class="f">هدف مطالعه ماهانه (دقیقه)<input id="monthGoal" type="number" min="120" max="44640" style="width:150px"></label></div></div>
     <div class="card"><h3>تحلیل هوشمند</h3><div id="insights"></div></div><div class="card"><div class="chh"><h3>گزارش هفتگی</h3><button class="btn ghost sm" id="copyWeekly" type="button">کپی گزارش</button></div><div id="weeklyReport"></div></div>
     <div class="card"><div class="chh"><h3>دستاوردها</h3><span class="muted">با ادامه دادن باز می‌شوند</span></div><div class="badges" id="badges"></div></div>
-    
-    <!-- نمودارهای جدید -->
     <div class="card">
-      <div class="chh"><h3>مطالعه ۷ روز اخیر</h3><span class="mini">(دقیقه)</span></div>
-      <div class="chart-row" id="chartWeek"></div>
+      <div class="chh"><h3>روند پیشرفت</h3><div class="seg" id="rng"><button data-r="7">۷ روز</button><button data-r="14" class="on">۱۴ روز</button><button data-r="30">۳۰ روز</button><button data-r="90">۹۰ روز</button></div></div>
+      <div class="g2">
+        <div><div class="chh"><b style="font-size:13.5px">زمان مطالعه (ساعت)</b><span class="muted">مقیاس نمودار بر اساس هدف روزانه است</span></div><div class="bars" id="cS"></div><div class="xl" id="xS"></div></div>
+        <div><div class="chh"><b style="font-size:13.5px">تعداد تست</b></div><div class="bars" id="cT"></div><div class="xl" id="xT"></div></div>
+      </div>
+      <p class="muted" style="margin-top:10px">ستون سبز بهترین روز بازه است. خط قرمز، هدف روزانه است.</p>
     </div>
-    <div class="card">
-      <div class="chh"><h3>مطالعه ۴ هفته اخیر</h3><span class="mini">(دقیقه)</span></div>
-      <div class="chart-row" id="chartMonth"></div>
-    </div>
-    
     <div class="card"><h3>آمار هر درس</h3><div class="tw" id="subj"></div></div>
   </section>
 
@@ -159,7 +143,7 @@ table{min-width:620px}
     <form class="card" id="f">
       <h3 id="ft">ثبت گزارش روز</h3>
       <div class="row">
-        <label class="f">تاریخ (میلادی برای انتخاب)<input type="date" id="fd" required></label>
+        <label class="f">تاریخ<input type="date" id="fd" required></label>
       </div>
       
       <div style="background:var(--mist); border-radius:14px; padding:12px; margin-bottom:16px;">
@@ -224,14 +208,10 @@ const keyOf = d => d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.g
 const dOf = k => new Date(k + 'T12:00:00');
 const addDays = (k, n) => {const d = dOf(k); d.setDate(d.getDate() + n); return keyOf(d)};
 const TODAY = keyOf(new Date());
-
-// تبدیل تاریخ میلادی به شمسی
 const jl = (k, o) => new Intl.DateTimeFormat('fa-IR-u-ca-persian', o || {year: 'numeric', month: 'long', day: 'numeric', weekday: 'long'}).format(dOf(k));
 const jShort = k => new Intl.DateTimeFormat('fa-IR-u-ca-persian', {month: 'numeric', day: 'numeric'}).format(dOf(k));
-const jDayName = k => new Intl.DateTimeFormat('fa-IR-u-ca-persian', {weekday: 'short'}).format(dOf(k));
-
 const tm = m => { const h = Math.floor(m / 60), r = m % 60; return h ? fa(h) + ' ساعت' + (r ? ' و ' + fa(r) + ' دقیقه' : '') : fa(r) + ' دقیقه' };
-let LOGS = [], EDIT = null, tt; let timerSec=0,timerInt=null,timerRunning=false;
+let LOGS = [], RNG = 14, EDIT = null, tt; let timerSec=0,timerInt=null,timerRunning=false;
 let PLANS=JSON.parse(localStorage.getItem('studyPlans')||'[]');
 let FORM_ROWS = [];
 
@@ -284,57 +264,22 @@ function timerStart(){if(timerRunning)return;timerRunning=true;timerInt=setInter
 function timerPause(){timerRunning=false;clearInterval(timerInt);timerInt=null}
 function timerReset(){timerPause();timerSec=0;updateClock()}
 async function timerStop(){timerPause();if(timerSec<60){toast('حداقل یک دقیقه مطالعه لازم است');return}const row={day:TODAY,subject:$('#ts').value.trim()||'مطالعه',minutes:Math.floor(timerSec/60),tests:0,note:packNote('',{topic:$('#tp').value.trim(),correct:0,wrong:0,blank:0})};if(!sb){toast(SETUP_ERR);return}const {data,error}=await sb.from('study_logs').insert(row).select().single();if(error){toast('ثبت تایمر ناموفق بود');return}const telegramOk = await notify({action:'insert', day:row.day}); toast(telegramOk ? 'زمان مطالعه ثبت شد و به تلگرام ارسال شد' : 'زمان مطالعه ثبت شد؛ ارسال تلگرام ناموفق بود'); timerReset(); await load()}
-
-/* ===== نمودارهای جدید شبیه عکس ===== */
-function renderCharts(D) {
-  // نمودار ۷ روزه
-  let htmlW = '';
-  for(let i=6; i>=0; i--) {
-    const k = addDays(TODAY, -i);
-    const m = D[k] ? D[k].m : 0;
-    const h = m === 0 ? 10 : Math.max(15, Math.min(100, (m / 480) * 100));
-    const isToday = k === TODAY;
-    const isTop = m > 0 && m === Math.max(...[...Array(7)].map((_, idx) => D[addDays(TODAY, -idx)]?.m || 0));
-    const cls = m === 0 ? 'empty' : (isTop ? 'active top' : 'active');
-    
-    htmlW += `<div class="chart-col">
-      <div class="chart-bar ${cls} ${isToday?'today':''}" style="height:${h}%">
-        ${m>0 ? `<div class="chart-val">${fa(m)}</div>` : ''}
-      </div>
-      <div class="chart-label">${jDayName(k)}</div>
-    </div>`;
-  }
-  $('#chartWeek').innerHTML = htmlW;
-
-  // نمودار ۴ هفته (ماهانه)
-  let htmlM = '';
-  for(let i=3; i>=0; i--) {
-    const end = addDays(TODAY, -i*7);
-    const start = addDays(end, -6);
-    let sum = 0;
-    for(let j=0; j<7; j++) {
-        const k = addDays(start, j);
-        sum += D[k] ? D[k].m : 0;
-    }
-    const h = sum === 0 ? 10 : Math.max(15, Math.min(100, (sum / 2400) * 100));
-    const cls = sum === 0 ? 'empty' : 'active';
-    htmlM += `<div class="chart-col">
-      <div class="chart-bar ${cls}" style="height:${h}%">
-        ${sum>0 ? `<div class="chart-val">${fa(sum)}</div>` : ''}
-      </div>
-      <div class="chart-label">هفته ${fa(4-i)}</div>
-    </div>`;
-  }
-  $('#chartMonth').innerHTML = htmlM;
-}
-
 /* ===== رندر ===== */
 function render() {
   const D = byDay(); 
   if ($('#stats')) $('#stats').innerHTML = statCards(D); 
   if ($('#hstats')) $('#hstats').innerHTML = statCards(D);
-  $('#sl').innerHTML = [...new Set([...DEFAULT_SUBJECTS, ...LOGS.map(r => r.subject)])].map(s => `<option value="${esc(s)}">`).join('');
-  renderCharts(D); subjects(); history(D); renderToday(D); renderInsights(D); renderBadges(D); renderWeekly(D); plansRender();
+  chart(D); subjects(); history(D); renderToday(D); renderInsights(D); renderBadges(D); renderWeekly(D); plansRender();
+}
+function chart(D) {
+  const goal = +$('#goal').value || 240, ks = []; for (let i = RNG - 1; i >= 0; i--) ks.push(addDays(TODAY, -i));
+  const draw = (box, xl, vals, fmt, goalV) => {
+    const max = Math.max(1, goalV || 0, ...vals), top = Math.max(...vals);
+    $(box).innerHTML = vals.map((v, i) => `<div class="bar${ks[i] === TODAY ? ' on' : ''}${v && v === top ? ' top' : ''}" title="${jl(ks[i], {month: 'long', day: 'numeric'})}: ${fmt(v)}"><i style="height:${v * 100 / max}%"></i></div>`).join('') + (goalV ? `<div class="goal" style="bottom:${goalV * 100 / max}%"></div>` : '');
+    const st = Math.ceil(ks.length / 10); $(xl).innerHTML = ks.map((k, i) => `<span>${i % st === 0 ? jShort(k) : ''}</span>`).join('');
+  };
+  draw('#cS', '#xS', ks.map(k => D[k] ? D[k].m : 0), v => tm(v), goal);
+  draw('#cT', '#xT', ks.map(k => D[k] ? D[k].t : 0), v => fa(v) + ' تست');
 }
 function subjects() {
   const S = bySubj(), rows = Object.entries(S).sort((a, b) => b[1].m - a[1].m), tot = rows.reduce((a, [, s]) => a + s.m, 0) || 1;
@@ -378,42 +323,20 @@ function history(D) {
 /* ===== فرم ثبت گروهی (دروس) ===== */
 function renderFormRows() {
   $('#subjectsList').innerHTML = FORM_ROWS.map((r, i) => `
-    <div class="subject-row">
-      <input class="sr-s" placeholder="درس" value="${esc(r.subject)}" oninput="FORM_ROWS[${i}].subject=this.value" style="padding:8px">
-      <input class="sr-t" placeholder="مبحث" value="${esc(r.topic)}" oninput="FORM_ROWS[${i}].topic=this.value" style="padding:8px">
-      
-      <div class="num-group sr-m">
-        <label>دقیقه</label>
-        <div class="num-input">
-          <button type="button" onclick="changeNum(${i}, 'minutes', -10)" style="border:0;background:none;cursor:pointer;font-size:16px;color:var(--blue)">-</button>
-          <input type="number" value="${r.minutes}" oninput="FORM_ROWS[${i}].minutes=+this.value" onblur="if(!this.value) this.value=0">
-          <button type="button" onclick="changeNum(${i}, 'minutes', 10)" style="border:0;background:none;cursor:pointer;font-size:16px;color:var(--blue)">+</button>
-        </div>
-      </div>
-
-      <div class="num-group sr-d">
-        <label>تست</label>
-        <div class="num-input">
-          <button type="button" onclick="changeNum(${i}, 'tests', -5)" style="border:0;background:none;cursor:pointer;font-size:16px;color:var(--blue)">-</button>
-          <input type="number" value="${r.tests}" oninput="FORM_ROWS[${i}].tests=+this.value" onblur="if(!this.value) this.value=0">
-          <button type="button" onclick="changeNum(${i}, 'tests', 5)" style="border:0;background:none;cursor:pointer;font-size:16px;color:var(--blue)">+</button>
-        </div>
-      </div>
-      
-      <button type="button" class="btn del sm sr-a" onclick="removeFormRow(${i})" style="padding:8px; align-self:center;">✕</button>
+    <div class="subject-row" style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap:8px; margin-bottom:8px; align-items:center; background:#fff; padding:8px; border-radius:10px;">
+      <input placeholder="درس" value="${esc(r.subject)}" oninput="FORM_ROWS[${i}].subject=this.value" style="padding:8px">
+      <input placeholder="مبحث" value="${esc(r.topic)}" oninput="FORM_ROWS[${i}].topic=this.value" style="padding:8px">
+      <input type="number" placeholder="دقیقه" value="${r.minutes}" oninput="FORM_ROWS[${i}].minutes=+this.value" style="padding:8px">
+      <input type="number" placeholder="تست" value="${r.tests}" oninput="FORM_ROWS[${i}].tests=+this.value" style="padding:8px">
+      <button type="button" class="btn del sm" onclick="removeFormRow(${i})">✕</button>
     </div>
   `).join('');
 }
-
-window.changeNum = (index, field, amount) => {
-  FORM_ROWS[index][field] = Math.max(0, (FORM_ROWS[index][field] || 0) + amount);
-  renderFormRows();
-};
 window.removeFormRow = (i) => { FORM_ROWS.splice(i, 1); renderFormRows(); };
-window.addFormRow = () => { FORM_ROWS.push({ subject: '', topic: '', minutes: 0, tests: 0 }); renderFormRows(); };
+window.addFormRow = () => { FORM_ROWS.push({ subject: '', topic: '', minutes: 60, tests: 0 }); renderFormRows(); };
 
 function resetForm() {
-  EDIT = null; FORM_ROWS = [{ subject: '', topic: '', minutes: 0, tests: 0 }];
+  EDIT = null; FORM_ROWS = [{ subject: '', topic: '', minutes: 60, tests: 0 }];
   $('#fd').value = TODAY; $('#ferr').textContent = '';
   $('#ft').textContent = 'ثبت گزارش روز'; $('#fb').textContent = 'ثبت کل گزارش';
   $('#fc').classList.add('hide');
@@ -425,7 +348,8 @@ $('#addSubjectRow').onclick = addFormRow;
 /* ===== ناوبری ===== */
 function view(v) {$$('#tabs button').forEach(b => b.classList.toggle('on', b.dataset.v === v)); ['dash', 'add', 'plan', 'timer', 'hist'].forEach(x => $('#' + x).classList.toggle('hide', x !== v)); scrollTo(0, 0)}
 $('#tabs').onclick = e => {const b = e.target.closest('button'); if (b) {if (b.dataset.v !== 'add') resetForm(); view(b.dataset.v)}};
-$('#goal').onchange = () => {localStorage.setItem('goal', $('#goal').value); renderCharts(byDay()); renderToday(byDay()); renderInsights(byDay())}; $('#testGoal').onchange=()=>{localStorage.setItem('testGoal',$('#testGoal').value);renderToday(byDay())}; $('#weekGoal').onchange=()=>{localStorage.setItem('weekGoal',$('#weekGoal').value);renderToday(byDay());renderInsights(byDay())}; $('#monthGoal').onchange=()=>localStorage.setItem('monthGoal',$('#monthGoal').value);
+$('#rng').onclick = e => {const b = e.target.closest('button'); if (!b) return; RNG = +b.dataset.r; $$('#rng button').forEach(x => x.classList.toggle('on', x === b)); chart(byDay())};
+$('#goal').onchange = () => {localStorage.setItem('goal', $('#goal').value); chart(byDay()); renderToday(byDay()); renderInsights(byDay())}; $('#testGoal').onchange=()=>{localStorage.setItem('testGoal',$('#testGoal').value);renderToday(byDay())}; $('#weekGoal').onchange=()=>{localStorage.setItem('weekGoal',$('#weekGoal').value);renderToday(byDay());renderInsights(byDay())}; $('#monthGoal').onchange=()=>localStorage.setItem('monthGoal',$('#monthGoal').value);
 
 /* ===== ثبت و ویرایش ===== */
 $('#fc').onclick = () => {resetForm(); view('hist')};
@@ -500,9 +424,16 @@ async function notify(body) {
       body: JSON.stringify(body)
     });
     
-    if (!res.ok) return false;
+    if (!res.ok) {
+      console.error('Function returned error:', res.status, await res.text());
+      return false;
+    }
+    
     const data = await res.json();
-    if (data && data.ok === false) return false;
+    if (data && data.ok === false) {
+      console.error('Telegram notify failed:', data.error);
+      return false;
+    }
     return true;
   } catch (e) {
     console.error('Telegram notify exception:', e);
