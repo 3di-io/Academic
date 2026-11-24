@@ -213,15 +213,15 @@ const jShort = k => new Intl.DateTimeFormat('fa-IR-u-ca-persian', {month: 'numer
 const tm = m => { const h = Math.floor(m / 60), r = m % 60; return h ? fa(h) + ' ساعت' + (r ? ' و ' + fa(r) + ' دقیقه' : '') : fa(r) + ' دقیقه' };
 let LOGS = [], RNG = 14, EDIT = null, tt; let timerSec=0,timerInt=null,timerRunning=false;
 let PLANS=JSON.parse(localStorage.getItem('studyPlans')||'[]');
-let FORM_ROWS = []; // آرایه‌ای برای نگهداری دروس در فرم ثبت
+let FORM_ROWS = [];
 
 function toast(t) {const e = $('#toast'); e.textContent = t; e.classList.remove('hide'); clearTimeout(tt); tt = setTimeout(() => e.classList.add('hide'), 2600)}
 
 /* ===== شروع ===== */
 async function start() {
   $('#today').textContent = jl(TODAY); $('#fd').value = TODAY; $('#fd').max = TODAY;
-  const g=goals(); $('#goal').value=g.day; $('#testGoal').value=g.tests; $('#weekGoal').value=g.week; $('#monthGoal').value=g.month; $('#pd').value=TODAY; $('#fd').max = TODAY;
-  resetForm(); // فرم ثبت را آماده می‌کنیم
+  const g=goals(); $('#goal').value=g.day; $('#testGoal').value=g.tests; $('#weekGoal').value=g.week; $('#monthGoal').value=g.month; $('#pd').value=TODAY;
+  resetForm(); 
   await load();
 }
 async function load() {
@@ -269,7 +269,6 @@ function render() {
   const D = byDay(); 
   if ($('#stats')) $('#stats').innerHTML = statCards(D); 
   if ($('#hstats')) $('#hstats').innerHTML = statCards(D);
-  $('#sl').innerHTML = [...new Set([...DEFAULT_SUBJECTS, ...LOGS.map(r => r.subject)])].map(s => `<option value="${esc(s)}">`).join('');
   chart(D); subjects(); history(D); renderToday(D); renderInsights(D); renderBadges(D); renderWeekly(D); plansRender();
 }
 function chart(D) {
@@ -389,11 +388,9 @@ $('#f').onsubmit = async e => {
 
   let errorMsg = '';
   if (EDIT) {
-    // اگر در حال ویرایش هستیم، رکورد قبلی را آپدیت می‌کنیم
     const {error} = await sb.from('study_logs').update(rows[0]).eq('id', EDIT.id);
     if (error) errorMsg = error.message;
   } else {
-    // ثبت چندتایی (تمام دروس با هم)
     const {error} = await sb.from('study_logs').insert(rows);
     if (error) errorMsg = error.message;
   }
