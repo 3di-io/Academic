@@ -210,6 +210,14 @@ body.calm #snow,body.calm #burst{display:none!important}
 body.calm .cc-grid .card,body.calm .hc.l4,body.calm .ring .rf,body.calm .progress.done i,body.calm .ind,body.calm .pill,body.calm .plus,body.calm .logo,body.calm .exm{box-shadow:none!important;filter:none!important;text-shadow:none!important}
 body.calm *{animation:none!important;transition-duration:.01s!important}
 #ws .jd{display:flex;gap:6px;margin-top:6px}#ws .jd select{flex:1;min-width:0;padding:10px 6px;background:var(--mist);color:#fff;border:1px solid var(--line);border-radius:12px}#ws .jd option{color:#000}
+#bnav .sc button{width:68px;min-width:68px;padding:8px 2px;overflow:hidden}
+#bnav .sc button span[data-en]{display:block;max-width:100%;white-space:nowrap;text-overflow:ellipsis;overflow:hidden;transition:opacity .23s ease,transform .23s ease}
+#bnav .sc button span.lf{opacity:0;transform:translateY(-5px)}#bnav .sc button span.up{opacity:0;transform:translateY(6px);transition:none}
+#bnav .plus{display:grid;place-items:center;padding:0;line-height:0;font-family:sans-serif;width:58px;min-width:58px;height:58px;flex:none}#bnav .plus svg{display:block}
+#snowDepth{position:fixed;left:0;right:0;bottom:0;height:var(--sd,8px);z-index:-1;pointer-events:none;background:linear-gradient(#fff0,#eaf4ffcc 45%,#fff);border-radius:50% 50% 0 0/26px 26px 0 0;opacity:0;transition:height 2.5s ease,opacity .7s ease}#snowDepth.show{opacity:.9}
+#timer.run #clock{animation:brth 4s ease-in-out infinite;border-radius:40px}@keyframes brth{0%,100%{box-shadow:0 0 0 0 #a0d2ff00,inset 0 0 18px #a0d2ff22;transform:scale(1)}50%{box-shadow:0 0 36px 6px #a0d2ff55,inset 0 0 28px #a0d2ff33;transform:scale(1.035)}}
+.rv-flakes{display:flex;flex-wrap:wrap;gap:10px}.rv-flakes span{width:46px;height:46px;display:grid;place-items:center;background:#ffffff12;border-radius:14px}
+@media(prefers-reduced-motion:reduce){#timer.run #clock{animation:none}}
 </style>
 </head>
 <body>
@@ -217,14 +225,15 @@ body.calm *{animation:none!important;transition-duration:.01s!important}
 <button data-go="home"><i>🏠</i><span data-en="Home" data-fa="خانه">Home</span></button>
 <button data-go="dash"><i>📊</i><span data-en="Overview" data-fa="داشبورد">Overview</span></button>
 <button data-go="plan"><i>🗓</i><span data-en="Plan" data-fa="برنامه">Plan</span></button>
+<button data-go="review"><i>🔁</i><span data-en="Review" data-fa="مرور">Review</span></button>
 <button data-go="analytics"><i>📈</i><span data-en="Stats" data-fa="آمار">Stats</span></button>
 <button data-go="timer"><i>⏱</i><span data-en="Timer" data-fa="تایمر">Timer</span></button>
 <button data-go="hist"><i>📅</i><span data-en="History" data-fa="تاریخچه">History</span></button>
 <button data-go="tools"><i>🧰</i><span data-en="Tools" data-fa="ابزارها">Tools</span></button>
 <button data-go="music"><i>🎧</i><span data-en="Music" data-fa="موسیقی">Music</span></button>
 <button data-go="settings"><i>⚙️</i><span data-en="Settings" data-fa="تنظیمات">Settings</span></button>
-</div></div><button class="plus" data-go="add" aria-label="Log report">＋</button></nav>
-<div id="bg"></div><canvas id="snow"></canvas>
+</div></div><button class="plus" data-go="add" aria-label="Log report"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button></nav>
+<div id="bg"></div><div id="snowDepth"></div><canvas id="snow"></canvas>
 <div id="landing-page">
 <nav class="navbar container">
 <a href="#" class="nav-brand" aria-label="Frost Navy"><span class="logo" role="img"></span><span class="brand-txt">✦ FROST NAVY</span></a>
@@ -312,6 +321,7 @@ body.calm *{animation:none!important;transition-duration:.01s!important}
   </section>
 
   <section id="tools" class="hide"></section>
+  <section id="review" class="hide"></section>
   <!-- تاریخچه -->
   <section id="hist" class="hide">
     <div class="card"><div class="stats" id="hstats"></div></div>
@@ -400,6 +410,9 @@ function renderWeekly(D){const start=addDays(TODAY,-6), rows=LOGS.filter(r=>r.da
 function renderBadges(D){const M=LOGS.reduce((a,r)=>a+r.minutes,0),T=LOGS.reduce((a,r)=>a+r.tests,0),st=streak(D),days=Object.keys(D).length;const bs=[['🌱 شروع شد',days>=1],['⏱ ۱۰ ساعت',M>=600],['🔥 ۷ روز',st>=7],['🔥 ۳۰ روز',st>=30],['📚 ۱۰۰ ساعت',M>=6000],['📝 ۱۰۰۰ تست',T>=1000],['🎯 ۱۰ روز هدف',countGoalDays(D)>=10]];$('#badges').innerHTML=bs.map(([x,on])=>`<span class="badget" style="opacity:${on?1:.4}">${on?'🏆':'🔒'} ${x}</span>`).join('')}
 function countGoalDays(D){const g=goals();return Object.entries(D).filter(([k,v])=>v.m>=g.day).length}
 function plansRender(){PLANS.sort((a,b)=>(a.day+a.time).localeCompare(b.day+b.time));$('#plans').innerHTML=PLANS.length?PLANS.map((p,i)=>`<div class="plan-item ${p.done?'done':''}"><span>${jShort(p.day)} ${p.time}</span><span><b>${esc(p.subject)}</b>${p.topic?' — '+esc(p.topic):''}<br><span class="mini">${fa(p.minutes)} دقیقه</span></span><span><button class="btn ghost sm" data-plan="${i}">${p.done?'بازگردانی':'✓ انجام شد'}</button></span></div>`).join(''):'<p class="muted">هنوز برنامه‌ای ثبت نشده.</p>'}
+async function loadPlans(){if(!sb)return;try{const old=JSON.parse(localStorage.getItem('studyPlans')||'[]');if(old.length&&!localStorage.getItem('plansMig')){const {error}=await sb.from('study_plans').insert(old.map(p=>({plan_date:p.day,plan_time:p.time||null,subject:p.subject,topic:p.topic||null,minutes:p.minutes||60,done:!!p.done})));if(!error){localStorage.setItem('plansMig','1');localStorage.removeItem('studyPlans')}}
+ const {data,error}=await sb.from('study_plans').select('*').order('plan_date').order('plan_time');if(error)return;PLANS=data.map(p=>({id:p.id,day:p.plan_date,time:(p.plan_time||'').slice(0,5),subject:p.subject,topic:p.topic||'',minutes:p.minutes,done:p.done}));plansRender()}catch(e){}}
+async function syncGoals(){if(!sb)return;try{const {data}=await sb.from('study_goals').select('*').order('created_at').limit(1),g=data&&data[0];if(!g)return;window.GOAL_ID=g.id;[['goal',g.daily_minutes],['testGoal',g.daily_tests],['weekGoal',g.weekly_minutes],['monthGoal',g.monthly_minutes]].forEach(([k,v])=>{localStorage.setItem(k,v);const el=document.getElementById(k);if(el)el.value=v});render()}catch(e){}}
 function savePlans(){localStorage.setItem('studyPlans',JSON.stringify(PLANS));plansRender()}
 function updateClock(){const h=Math.floor(timerSec/3600),m=Math.floor(timerSec%3600/60),s=timerSec%60;$('#clock').textContent=[h,m,s].map(pad).join(':')}
 function timerStart(){if(timerRunning)return;timerRunning=true;timerInt=setInterval(()=>{timerSec++;updateClock()},1000)}
@@ -491,7 +504,7 @@ function resetForm() {
 $('#addSubjectRow').onclick = addFormRow;
 
 /* ===== ناوبری ===== */
-function view(v) {['dash', 'add', 'plan', 'timer', 'hist', 'tools'].forEach(x => $('#' + x).classList.toggle('hide', x !== v)); scrollTo(0, 0)}
+function view(v) {['dash', 'add', 'plan', 'timer', 'hist', 'tools', 'review'].forEach(x => $('#' + x).classList.toggle('hide', x !== v)); scrollTo(0, 0)}
 
 $('#rng').onclick = e => {const b = e.target.closest('button'); if (!b) return; RNG = +b.dataset.r; $$('#rng button').forEach(x => x.classList.toggle('on', x === b)); chart(byDay())};
 $('#goal').onchange = () => {localStorage.setItem('goal', $('#goal').value); chart(byDay()); renderToday(byDay()); renderInsights(byDay())}; $('#testGoal').onchange=()=>{localStorage.setItem('testGoal',$('#testGoal').value);renderToday(byDay())}; $('#weekGoal').onchange=()=>{localStorage.setItem('weekGoal',$('#weekGoal').value);renderToday(byDay());renderInsights(byDay())}; $('#monthGoal').onchange=()=>localStorage.setItem('monthGoal',$('#monthGoal').value);
@@ -552,9 +565,9 @@ $('#f').onsubmit = async e => {
   toast(EDIT ? (telegramOk ? 'تغییرات ذخیره شد و به تلگرام ارسال شد' : 'تغییرات ذخیره شد؛ ارسال تلگرام ناموفق بود') : (telegramOk ? 'گزارش ثبت شد و به تلگرام ارسال شد' : 'گزارش ثبت شد؛ ارسال تلگرام ناموفق بود'));
   const wasEdit = !!EDIT; resetForm(); $('#fd').value = day; await load(); if (wasEdit) view('hist');
 };
-$('#planForm').onsubmit=e=>{e.preventDefault();PLANS.push({day:$('#pd').value,time:$('#pt').value,subject:$('#ps').value.trim(),topic:$('#pp').value.trim(),minutes:+$('#pm').value||60,done:false});savePlans();e.target.reset();$('#pd').value=TODAY;toast('به برنامه اضافه شد')};
-$('#plans').onclick=e=>{const b=e.target.closest('[data-plan]');if(!b)return;const i=+b.dataset.plan;PLANS[i].done=!PLANS[i].done;savePlans()};
-$('#clearPlans').onclick=()=>{PLANS=PLANS.filter(x=>!x.done);savePlans();toast('برنامه‌های انجام‌شده پاک شدند')};
+$('#planForm').onsubmit=async e=>{e.preventDefault();const p={plan_date:$('#pd').value,plan_time:$('#pt').value||null,subject:$('#ps').value.trim(),topic:$('#pp').value.trim()||null,minutes:+$('#pm').value||60};if(sb){const {error}=await sb.from('study_plans').insert(p);if(error)return toast('ناموفق: '+error.message);await loadPlans()}else{PLANS.push({day:p.plan_date,time:p.plan_time||'',subject:p.subject,topic:p.topic||'',minutes:p.minutes,done:false});savePlans()}e.target.reset();$('#pd').value=TODAY;toast('به برنامه اضافه شد')};
+$('#plans').onclick=async e=>{const b=e.target.closest('[data-plan]');if(!b)return;const q=PLANS[+b.dataset.plan];q.done=!q.done;if(sb&&q.id){await sb.from('study_plans').update({done:q.done}).eq('id',q.id);await loadPlans()}else savePlans()};
+$('#clearPlans').onclick=async()=>{if(sb){await sb.from('study_plans').delete().eq('done',true);await loadPlans()}else{PLANS=PLANS.filter(x=>!x.done);savePlans()}toast('برنامه‌های انجام‌شده پاک شدند')};
 $('#copyWeekly').onclick=()=>{navigator.clipboard?.writeText(trT(window._weeklyText||'')).then(()=>toast('گزارش کپی شد')).catch(()=>toast('کپی خودکار در این مرورگر در دسترس نیست'))}; $('#startTimer').onclick=timerStart; $('#pauseTimer').onclick=timerPause; $('#resetTimer').onclick=timerReset; $('#stopTimer').onclick=timerStop; updateClock();
 
 /* پیام تلگرام */
@@ -602,13 +615,13 @@ $('#startTimer').onclick=()=>{if(!POMO)timerStart()};
 const SIDE={study_todos:[],study_errors:[],study_reflections:[],study_reviews:[]};let MISS=false;
 async function loadSide(){if(!sb)return;MISS=false;for(const t in SIDE){const {data,error}=await sb.from(t).select('*').order('day',{ascending:false}).limit(1000);(window.SIDE_STATE||={})[t]=error?'err':'ok';if(error){MISS=true;SIDE[t]=[]}else SIDE[t]=data}renderTools()}
 const wr=async q=>{const {error}=await q;if(error)toast('ناموفق: '+error.message);await loadSide()};
-async function mkReviews(rows){try{const out=[];rows.forEach(r=>{if(!r.minutes)return;const m=parseMeta(r).meta;[1,3,7,30].forEach((n,i)=>out.push({day:r.day,label:r.subject+(m.topic?' — '+m.topic:''),due_date:addDays(r.day,n),step:i+1}))});if(out.length&&sb)await sb.from('study_reviews').insert(out)}catch(e){}}
+async function mkReviews(rows){try{const out=[],seen=new Set(SIDE.study_reviews.map(x=>x.day+'|'+x.label+'|'+x.step));rows.forEach(r=>{if(!r.minutes)return;const m=parseMeta(r).meta;[1,3,7,14].forEach((n,i)=>{const o={day:r.day,label:r.subject+(m.topic?' — '+m.topic:''),due_date:addDays(r.day,n),step:i+1},k=o.day+'|'+o.label+'|'+o.step;if(!seen.has(k)){seen.add(k);out.push(o)}})});if(out.length&&sb)await sb.from('study_reviews').insert(out)}catch(e){}}
 const MO=['😫','😕','😐','🙂','🤩'];
 function renderTools(){const S=SIDE,T=S.study_todos.filter(x=>x.day===TODAY),E=S.study_errors.filter(x=>!x.reviewed),R=S.study_reviews.filter(x=>!x.done&&x.due_date<=TODAY),up=S.study_reviews.filter(x=>!x.done&&x.due_date>TODAY).length,F=S.study_reflections.find(x=>x.day===TODAY),wk=S.study_reflections.filter(x=>x.day>=addDays(TODAY,-6)&&x.mood),avg=wk.length?wk.reduce((a,x)=>a+MO.indexOf(x.mood),0)/wk.length:0;
 const del=(t,id)=>`<button class="btn del sm" data-a="dd" data-t="${t}" data-id="${id}">✕</button>`;
 $('#tools').innerHTML=(MISS?'<div class="card"><p class="err">برخی جدول‌ها هنوز در سوپابیس ساخته نشده‌اند؛ فایل SQL را اجرا کن.</p></div>':'')+
 `<div class="card"><h3>✅ کارهای امروز</h3>${T.map(x=>`<div class="plan-item${x.done?' done':''}"><label style="display:flex;gap:8px;align-items:center"><input type="checkbox" style="width:auto" ${x.done?'checked':''} data-a="td" data-id="${x.id}">${esc(x.title)}</label>${del('study_todos',x.id)}</div>`).join('')||'<p class="muted">کاری ثبت نشده.</p>'}<div style="display:flex;gap:8px;margin-top:10px"><input id="tdi" placeholder="کار جدید..."><button class="btn sm" data-a="ta">افزودن</button></div></div>
-<div class="card"><h3>🔁 مرورهای سررسید (${fa(R.length)})</h3>${R.map(x=>`<div class="plan-item"><span><b>${esc(x.label)}</b><br><span class="mini">مرور ${fa(x.step)} · ثبت: ${jShort(x.day)}</span></span><button class="btn ghost sm" data-a="rv" data-id="${x.id}">✓ مرور شد</button></div>`).join('')||'<p class="muted">مروری برای امروز نداری.</p>'}<p class="mini" style="margin-top:8px">${fa(up)} مرور آینده (۱، ۳، ۷ و ۳۰ روز پس از هر ثبت)</p></div>
+<div class="card"><h3>🔁 مرورهای سررسید (${fa(R.length)})</h3>${R.map(x=>`<div class="plan-item"><span><b>${esc(x.label)}</b><br><span class="mini">مرور ${fa(x.step)} · ثبت: ${jShort(x.day)}</span></span><button class="btn ghost sm" data-a="rv" data-id="${x.id}">✓ مرور شد</button></div>`).join('')||'<p class="muted">مروری برای امروز نداری.</p>'}<p class="mini" style="margin-top:8px">${fa(up)} مرور آینده (۱، ۳، ۷ و ۱۴ روز پس از هر ثبت)</p></div>
 <div class="card"><h3>❌ بانک اشتباهات</h3><div class="row"><input id="ers" placeholder="درس"><input id="ert" placeholder="مبحث"><select id="erz"><option>بی‌دقتی</option><option>بلد نبودم</option><option>فراموشی</option><option>محاسباتی</option><option>کمبود وقت</option></select><input id="ern" placeholder="توضیح / شماره تست"></div><button class="btn sm" data-a="ea">ثبت اشتباه</button>${E.map(x=>`<div class="plan-item"><span><b>${esc(x.subject)}</b>${x.topic?' — '+esc(x.topic):''} <span class="pill">${esc(x.reason||'')}</span><br><span class="mini">${jShort(x.day)} ${esc(x.note||'')}</span></span><span><button class="btn ghost sm" data-a="er" data-id="${x.id}">مرور شد</button> ${del('study_errors',x.id)}</span></div>`).join('')}</div>
 <div class="card"><h3>🌙 ارزیابی امروز</h3><div style="display:flex;gap:8px;margin-bottom:10px">${MO.map(m=>`<button class="btn ${F&&F.mood===m?'':'ghost'}" data-a="mood" data-m="${m}">${m}</button>`).join('')}</div><div style="display:flex;gap:8px"><input id="rfb" placeholder="امروز چطور بود؟" value="${esc(F?.body||'')}"><button class="btn sm" data-a="rf">ذخیره</button></div><p class="mini" style="margin-top:8px">هفته‌ی اخیر: ${wk.length?fa(wk.length)+' روز ثبت · میانگین حال '+MO[Math.round(avg)]:'—'}</p></div>
 <div class="card"><h3>💾 داده‌ها</h3><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" data-a="csv">خروجی CSV (تاریخ شمسی)</button><button class="btn ghost" data-a="bk">دانلود پشتیبان JSON</button><label class="btn ghost">بازیابی از پشتیبان<input type="file" id="rs" accept=".json" class="hide"></label></div></div>`}
@@ -644,7 +657,7 @@ const WX={'ساعت':'Time','تاریخ':'Date','درس':'Subject','مبحث':'T
 'هنوز گزارشی ثبت نشده. از «ثبت گزارش» شروع کن.':'No reports yet. Start with “Log Report”.','تاریخچه‌ات پس از اولین گزارش اینجا ساخته می‌شود.':'Your history appears here after your first report.','تست در ساعت':'Tests/hour','سهم از کل':'Share','زمان مطالعه':'Study time','میانگین روزانه':'Daily average',
 'حداقل یک درس اضافه کنید.':'Add at least one subject.','مجموع درست و غلط از تعداد تست بیشتر است.':'Correct + wrong exceeds the number of tests.','حداقل زمان یا تست یک درس باید بیشتر از 0 باشد.':'At least one subject needs time or tests above 0.','ذخیره نشد: ':'Not saved: ','حداقل یک دقیقه مطالعه لازم است':'At least one minute of study is needed','ثبت تایمر ناموفق بود':'Could not log the timer',
 'زمان مطالعه ثبت شد و به تلگرام ارسال شد':'Study time logged and sent to Telegram','زمان مطالعه ثبت شد؛ ارسال تلگرام ناموفق بود':'Study time logged; Telegram failed','حذف نشد':'Not deleted','حذف شد و به تلگرام اطلاع داده شد':'Deleted and Telegram notified','حذف شد؛ اطلاع تلگرام ناموفق بود':'Deleted; Telegram failed','تغییرات ذخیره شد و به تلگرام ارسال شد':'Changes saved and sent to Telegram','تغییرات ذخیره شد؛ ارسال تلگرام ناموفق بود':'Changes saved; Telegram failed','گزارش ثبت شد و به تلگرام ارسال شد':'Report saved and sent to Telegram','گزارش ثبت شد؛ ارسال تلگرام ناموفق بود':'Report saved; Telegram failed','گزارش کپی شد':'Report copied','کپی خودکار در این مرورگر در دسترس نیست':'Copy is not available in this browser','دریافت اطلاعات ممکن نشد: ':'Could not load data: ',
-'✓ انجام شد':'✓ Done','بازگردانی':'Undo','✅ کارهای امروز':'✅ Today’s tasks','کاری ثبت نشده.':'No tasks yet.','کار جدید...':'New task...','🔁 مرورهای سررسید':'🔁 Due reviews','مرور ':'Review ','ثبت: ':'Logged: ','✓ مرور شد':'✓ Reviewed','مروری برای امروز نداری.':'No reviews due today.','مرور آینده':'upcoming reviews','(۱، ۳، ۷ و ۳۰ روز پس از هر ثبت)':'(1, 3, 7 and 30 days after each log)',
+'✓ انجام شد':'✓ Done','بازگردانی':'Undo','✅ کارهای امروز':'✅ Today’s tasks','کاری ثبت نشده.':'No tasks yet.','کار جدید...':'New task...','🔁 مرورهای سررسید':'🔁 Due reviews','مرور ':'Review ','ثبت: ':'Logged: ','✓ مرور شد':'✓ Reviewed','مروری برای امروز نداری.':'No reviews due today.','مرور آینده':'upcoming reviews','(۱، ۳، ۷ و ۱۴ روز پس از هر ثبت)':'(1, 3, 7 and 14 days after each log)',
 '❌ بانک اشتباهات':'❌ Mistake bank','بی‌دقتی':'Carelessness','بلد نبودم':'Didn’t know','فراموشی':'Forgot','محاسباتی':'Calculation','کمبود وقت':'Out of time','توضیح / شماره تست':'Note / test number','ثبت اشتباه':'Log mistake','مرور شد':'Reviewed','🌙 ارزیابی امروز':'🌙 Today’s check-in','امروز چطور بود؟':'How was today?','هفته‌ی اخیر: ':'Last week: ','روز ثبت · میانگین حال ':'days logged · average mood ','💾 داده‌ها':'💾 Data','خروجی CSV (تاریخ شمسی)':'Export CSV','دانلود پشتیبان JSON':'Download JSON backup','بازیابی از پشتیبان':'Restore backup','برخی جدول‌ها هنوز در سوپابیس ساخته نشده‌اند؛ فایل SQL را اجرا کن.':'Some Supabase tables are missing; run the SQL file.','ناموفق: ':'Failed: ','بازیابی شد':'Restored'}).sort((a,b)=>b[0].length-a[0].length),OT=new WeakMap();
 const dig=t=>t.replace(/[۰-۹]/g,c=>c.charCodeAt(0)-1776).replace(/،/g,',');
 function trT(t){if(currentLang!=='en')return t;const k=t.trim();if(WX[k])return t.replace(k,WX[k]);for(const[a,b]of WM)if(t.includes(a))t=t.split(a).join(b);return dig(t)}
@@ -659,7 +672,11 @@ function go(v){menu(false);if(v==='home')return closeWorkspace();openWorkspace()
 
 addEventListener('keydown',e=>{if(e.key==='Escape')menu(false)});
 let currentLang=localStorage.getItem('lang')||'en';
-function applyLang(l){currentLang=l;document.documentElement.lang=l;document.body.dir=l==='fa'?'rtl':'ltr';localStorage.setItem('lang',l);document.querySelectorAll('[data-en]').forEach(e=>e.innerHTML=l==='fa'?e.dataset.fa:e.dataset.en);document.getElementById('langBtn').textContent=l==='fa'?'EN':'FA';wsLang()}
+let navLang=null;
+function navFade(l){const NL=[...document.querySelectorAll('#bnav span[data-en]')],set=()=>NL.forEach(e=>e.textContent=l==='fa'?e.dataset.fa:e.dataset.en);
+ if(navLang===null||navLang===l){navLang=l;set();return}navLang=l;NL.forEach(e=>e.classList.add('lf'));
+ setTimeout(()=>{set();NL.forEach(e=>{e.classList.add('up');e.classList.remove('lf');requestAnimationFrame(()=>requestAnimationFrame(()=>e.classList.remove('up')))})},230)}
+function applyLang(l){currentLang=l;document.documentElement.lang=l;document.body.dir=l==='fa'?'rtl':'ltr';localStorage.setItem('lang',l);document.querySelectorAll('[data-en]:not(#bnav *)').forEach(e=>e.innerHTML=l==='fa'?e.dataset.fa:e.dataset.en);navFade(l);document.getElementById('langBtn').textContent=l==='fa'?'EN':'FA';wsLang()}
 document.getElementById('langBtn').onclick=()=>applyLang(currentLang==='en'?'fa':'en');applyLang(currentLang);
 /* بارش برف: سبک، با یک مسیر در هر فریم، متوقف در تب پنهان */
 (()=>{if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;const c=document.getElementById('snow'),x=c.getContext('2d');let W,H,on=true;const F=[],N=innerWidth<700?32:70;
@@ -876,10 +893,10 @@ view('dash');all()})();
 </script>
 <script>
 (()=>{const sc=$('#bnav .sc'),bs=[...sc.querySelectorAll('button')];let mus=false,cur='';const ind=sc.querySelector('.ind'),place=b=>{if(b){ind.style.width=b.offsetWidth+'px';ind.style.transform='translateX('+b.offsetLeft+'px)'}};const ro=window.ResizeObserver&&new ResizeObserver(()=>place(bs.find(x=>x.dataset.go===cur)));if(ro)bs.forEach(b=>ro.observe(b));
-function sync(){let v;if(!$('#landing-page').classList.contains('hide'))v=mus?'music':'home';else v=['dash','add','plan','timer','hist','tools','analytics','settings'].find(x=>!$('#'+x).classList.contains('hide'))||'dash';
+function sync(){let v;if(!$('#landing-page').classList.contains('hide'))v=mus?'music':'home';else v=['dash','add','plan','timer','hist','tools','review','analytics','settings'].find(x=>!$('#'+x).classList.contains('hide'))||'dash';
 $$('#bnav [data-go]').forEach(b=>b.classList.toggle('on',b.dataset.go===v));const b=bs.find(x=>x.dataset.go===v);place(b);if(v===cur)return;cur=v;if(b)sc.scrollTo({left:b.offsetLeft-(sc.clientWidth-b.offsetWidth)/2,behavior:'smooth'})}
 const _g=go;go=function(v){mus=v==='music';_g(v);sync()};
-const mo=new MutationObserver(sync);['landing-page','workspace','dash','add','plan','timer','hist','tools','analytics','settings'].forEach(id=>mo.observe($('#'+id),{attributes:true,attributeFilter:['class']}));sync()})();
+const mo=new MutationObserver(sync);['landing-page','workspace','dash','add','plan','timer','hist','tools','review','analytics','settings'].forEach(id=>mo.observe($('#'+id),{attributes:true,attributeFilter:['class']}));sync()})();
 </script>
 <script>
 (()=>{if(matchMedia('(prefers-reduced-motion:reduce)').matches)return;
@@ -940,9 +957,9 @@ let lp,pv;const hide=()=>{clearTimeout(lp);if(pv)pv.remove();pv=null};
 $('#dash').addEventListener('pointerdown',e=>{const c=e.target.closest('.hc');if(!c||c.classList.contains('fut'))return;lp=setTimeout(()=>{const k=c.dataset.day,d=byDay()[k],r=c.getBoundingClientRect();pv=document.createElement('div');pv.className='pv';pv.innerHTML=`<b>${jl(k,{month:'long',day:'numeric'})}</b><br>`+(d?tm(d.m)+' · '+fa(d.t)+' '+L('تست','tests')+'<br>'+[...new Set(d.items.map(x=>esc(x.subject)))].slice(0,4).join('، '):L('بدون گزارش','No report'));$('#ws').appendChild(pv);pv.style.left=Math.min(innerWidth-190,Math.max(8,r.left-80))+'px';pv.style.top=Math.max(8,r.top-pv.offsetHeight-10)+'px'},420)});
 ['pointerup','pointercancel','pointerleave','scroll'].forEach(v=>$('#dash').addEventListener(v,hide,true));
 /* انتقال جهت‌دار بین بخش‌ها */
-const ORD=['dash','plan','analytics','timer','hist','tools','settings','add'];let pv0='dash';const _v=view;view=function(v){_v(v);if(window.gsap&&!red&&v!==pv0&&$('#'+v)){const d=ORD.indexOf(v)>=ORD.indexOf(pv0)?1:-1;gsap.fromTo($('#'+v),{x:d*28,autoAlpha:0},{x:0,autoAlpha:1,duration:.4,ease:'power2.out',clearProps:'transform,opacity,visibility'})}pv0=v};
+const ORD=['dash','plan','review','analytics','timer','hist','tools','settings','add'];let pv0='dash';const _v=view;view=function(v){_v(v);if(window.gsap&&!red&&v!==pv0&&$('#'+v)){const d=ORD.indexOf(v)>=ORD.indexOf(pv0)?1:-1;gsap.fromTo($('#'+v),{x:d*28,autoAlpha:0},{x:0,autoAlpha:1,duration:.4,ease:'power2.out',clearProps:'transform,opacity,visibility'})}pv0=v};
 /* آیکون‌های خطی */
-const P={home:'<path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/>',dash:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',plan:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',analytics:'<path d="M3 3v18h18M7 15l4-4 3 3 5-6"/>',timer:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>',hist:'<path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 8v4l3 2"/>',tools:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3M3 13h18"/>',music:'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',settings:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>'};
+const P={home:'<path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/>',dash:'<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',plan:'<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/>',analytics:'<path d="M3 3v18h18M7 15l4-4 3 3 5-6"/>',timer:'<circle cx="12" cy="13" r="8"/><path d="M12 9v4l3 2M9 2h6"/>',hist:'<path d="M3 12a9 9 0 1 0 3-6.7M3 4v5h5M12 8v4l3 2"/>',tools:'<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3M3 13h18"/>',music:'<path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/>',review:'<path d="M17 2l4 4-4 4M3 11v-1a4 4 0 0 1 4-4h14M7 22l-4-4 4-4M21 13v1a4 4 0 0 1-4 4H3"/>',settings:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>'};
 $$('#bnav .sc button').forEach(b=>{const p=P[b.dataset.go],i=b.querySelector('i');if(p&&i)i.innerHTML=`<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${p}</svg>`});
 /* تنظیمات */
 const cb=$('#optCalm'),sb=$('#optSfx'),en=$('#exName'),ed=$('#exDate');cb.checked=LS('calm')==='1';sb.checked=LS('sfx')==='1';en.value=LS('exName')||'';ed.value=LS('exDate')||'';
@@ -963,6 +980,79 @@ push=()=>{let v=keyOf(clampJ(+sel[0].value,+sel[1].value,+sel[2].value));if(inp.
 sel.forEach(q=>q.onchange=push);Object.defineProperty(inp,'value',{get(){return D.get.call(this)},set(v){D.set.call(this,v);pull()},configurable:true});pull()}
 function jdSync(){const f=!EN_();['fd','pd','exDate'].forEach(id=>{const i=document.getElementById(id);if(!i)return;mk(i);i.style.display=f?'none':'';i._jd.style.display=f?'flex':'none'})}
 const _r=render;render=function(){_r();jdSync()};jdSync()})();
+</script>
+<script>
+/* ===== مرور فاصله‌دار هوشمند: ۱ روز، ۳ روز، ۱ هفته، ۲ هفته پس از ثبت ===== */
+(()=>{
+const T=(f,e)=>(localStorage.getItem('lang')||'en')==='en'?e:f;
+const st=document.createElement('style');st.textContent=`.rv-intro{color:var(--soft,#b9c9e0);font-size:13px;margin-bottom:14px}.rv-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}.rv-stats div{background:var(--mist,rgba(255,255,255,.09));border-radius:16px;padding:12px;text-align:center}.rv-stats b{display:block;font-size:22px;color:#fff}.rv-stats span{font-size:11.5px;color:var(--soft,#b9c9e0)}
+.rv-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-top:1px solid var(--line,rgba(255,255,255,.17))}.rv-list>.rv-item:first-child{border:0}
+.rv-chk{width:42px;height:42px;border-radius:50%;border:2px solid #8bb4e7;background:none;color:transparent;font-size:19px;flex:none;display:grid;place-items:center}.rv-chk:hover,.rv-chk:active{background:#8bb4e7;color:#0a192f}.rv-chk.un{border-color:#ffffff55;color:#fff;font-size:14px}
+.rv-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:3px}.rv-main b{color:#fff;overflow-wrap:anywhere}.rv-main .mini{color:var(--soft,#b9c9e0);font-size:11.5px}
+.rv-dots{display:flex;gap:4px;margin-top:3px}.rv-dots i{width:18px;height:5px;border-radius:9px;background:rgba(255,255,255,.2)}.rv-dots i.on{background:#5fe0a8}.rv-dots i.cur{background:#8bb4e7}
+.rv-chip{font-size:11.5px;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.1);color:#dbe8fa;white-space:nowrap}.rv-chip.late{background:rgba(255,154,154,.2);color:#ffb9b9}.rv-act{display:flex;gap:6px;align-items:center;flex:none}.rv-hard{width:34px;height:34px;border-radius:50%;border:1px solid #ffffff44;background:#ffffff14;font-size:15px}.rv-lock .rv-hard{display:none}.rv-fill{width:100%;margin-bottom:14px;border:1px dashed #ffffff55;background:none;color:#dbe8fa;border-radius:14px;padding:10px;font:inherit;font-size:13px}#bnav [data-go=review]{position:relative}.rv-badge{position:absolute;top:2px;inset-inline-end:6px;min-width:17px;height:17px;border-radius:9px;background:#ff6b6b;color:#fff;font:700 10px/17px sans-serif;text-align:center;font-style:normal;padding:0 4px}.rv-lock{opacity:.7}.rv-lock .rv-chk{opacity:.35;border-style:dashed;pointer-events:none}`;document.head.appendChild(st);
+const key=r=>r.day+'|'+r.label;
+function renderReview(){
+ const el=document.getElementById('review');if(!el)return;
+ const R=SIDE.study_reviews,G={};R.forEach(r=>(G[key(r)]||=[]).push(r));
+ const unlocked=r=>r.step<=1||!(G[key(r)]||[]).some(x=>x.step===r.step-1&&!x.done);
+ const open=R.filter(r=>!r.done).sort((a,b)=>a.due_date.localeCompare(b.due_date)||a.step-b.step);
+ const err=r=>{const [sj,...tp]=r.label.split(' — '),tz=tp.join(' — ');return SIDE.study_errors.filter(e=>!e.reviewed&&e.subject===sj&&(!e.topic||!tz||e.topic===tz)).length},isDue=r=>r.due_date<=TODAY&&unlocked(r),due=open.filter(isDue).sort((a,b)=>err(b)-err(a)||a.due_date.localeCompare(b.due_date)),later=open.filter(r=>!isDue(r)),done=R.filter(r=>r.done).sort((a,b)=>b.due_date.localeCompare(a.due_date)).slice(0,6);
+ const diff=(a,b)=>Math.round((dOf(a)-dOf(b))/864e5);
+ const dots=r=>'<span class="rv-dots">'+[1,2,3,4].map(n=>{const x=(G[key(r)]||[]).find(y=>y.step===n);return `<i class="${x&&x.done?'on':n===r.step?'cur':''}"></i>`}).join('')+'</span>';
+ const sub=r=>T('مرور','Review')+' '+fa(r.step)+T(' از ۴',' of 4')+' · '+T('ثبت','Logged')+' '+jShort(r.day);
+ const row=(r,btn,chip,cls)=>`<div class="rv-item ${cls||''}">${btn}<div class="rv-main"><b>${esc(r.label)}</b><span class="mini">${sub(r)}</span>${dots(r)}</div>${chip}</div>`;
+ const chk=r=>`<span class="rv-act"><button class="rv-chk" data-rv="do" data-id="${r.id}" aria-label="done">✓</button><button class="rv-hard" data-rv="hard" data-id="${r.id}" aria-label="hard" title="${T('سخت بود','Hard')}">😓</button></span>`;
+ const when=r=>{const d=diff(r.due_date,TODAY);return d===1?T('فردا','Tomorrow'):T('تا '+fa(d)+' روز دیگر','in '+fa(d)+' days')+' · '+jShort(r.due_date)};
+ el.innerHTML=(MISS?`<div class="card"><p class="err">${T('جدول مرورها در سوپابیس ساخته نشده؛ فایل SQL را اجرا کن.','The reviews table is missing in Supabase; run the SQL file.')}</p></div>`:'')+
+ `<div class="card"><h3>🔁 ${T('مرور فاصله‌دار','Spaced review')}</h3><p class="rv-intro">${T('هر درس و مبحثی که ثبت کنی، ۱ روز، ۳ روز، ۱ هفته و ۲ هفته بعد برای مرور به تو یادآوری می‌شود. بعد از زدن تیک هر مرور، مرور بعدی فعال می‌شود. اگر سخت بود 😓 را بزن تا زودتر برگردد. تیک دیرهنگام مرورهای بعدی را جابه‌جا می‌کند و مبحث‌های دارای اشتباه (⚠) اول می‌آیند.','Every subject and topic you log comes back for review after 1 day, 3 days, 1 week and 2 weeks. Tick a review and the next one unlocks; tap 😓 if it was hard and it comes back sooner. Late ticks shift the later reviews, and topics with open mistakes (⚠) come first.')}</p><div class="rv-stats"><div><b>${fa(due.length)}</b><span>${T('امروز','Due now')}</span></div><div><b>${fa(later.length)}</b><span>${T('در راه','Upcoming')}</span></div><div><b>${fa(R.filter(r=>r.done).length)}</b><span>${T('انجام‌شده','Completed')}</span></div></div></div>`+
+ `<div class="card"><h3>📌 ${T('مرورهای امروز','Due today')}</h3><div class="rv-list">${due.map(r=>{const l=diff(TODAY,r.due_date);const n=err(r);return row(r,chk(r),(n?`<span class="rv-chip late">⚠ ${fa(n)}</span>`:'')+(l>0?`<span class="rv-chip late">${T(fa(l)+' روز تأخیر',fa(l)+'d late')}</span>`:''))}).join('')||`<p class="muted">${T('مروری برای امروز نداری. 🌿','Nothing to review today. 🌿')}</p>`}</div></div>`+
+ `<div class="card"><h3>🗓 ${T('مرورهای پیش‌رو','Coming up')}</h3><div class="rv-list">${later.slice(0,30).map(r=>{const lk=r.due_date<=TODAY;return row(r,chk(r),`<span class="rv-chip">${lk?T('اول مرور قبلی','Finish previous'):when(r)}</span>`,'rv-lock')}).join('')||`<p class="muted">${T('هنوز مروری برنامه‌ریزی نشده؛ با ثبت گزارش شروع کن.','Nothing scheduled yet; log a report to begin.')}</p>`}</div></div>`+
+ (done.length?`<div class="card"><h3>✅ ${T('اخیراً انجام‌شده','Recently done')}</h3><div class="rv-list">${done.map(r=>row(r,`<button class="rv-chk un" data-rv="undo" data-id="${r.id}" aria-label="undo">↺</button>`,'')).join('')}</div></div>`:'');
+ el.querySelector('.rv-stats').insertAdjacentHTML('afterend',`<button class="rv-fill" data-rv="fill">➕ ${T('ساخت مرور برای گزارش‌های ۲ هفته‌ی اخیر','Create reviews for the last 2 weeks of logs')}</button>`);
+ const nb=document.querySelector('#bnav [data-go=review]');if(nb){let bd=nb.querySelector('.rv-badge');if(due.length){if(!bd){bd=document.createElement('em');bd.className='rv-badge';nb.appendChild(bd)}bd.textContent=fa(due.length)}else if(bd)bd.remove()}
+ return due.length;
+}
+function tgDaily(n){if(!sb||!n||(window.SIDE_STATE||{}).study_reviews!=='ok'||localStorage.getItem('rvTg')===TODAY)return;localStorage.setItem('rvTg',TODAY);notify({action:'reviews',day:TODAY})}
+const _rt=renderTools;renderTools=function(){_rt();tgDaily(renderReview())};
+document.getElementById('review').addEventListener('click',async e=>{const b=e.target.closest('[data-rv]');if(!b||!sb)return;const a=b.dataset.rv,id=b.dataset.id,dd=(x,y)=>Math.round((dOf(x)-dOf(y))/864e5),qs=[];let nxt=null;
+ if(a==='fill'){const seen=new Set(SIDE.study_reviews.map(x=>x.day+'|'+x.label+'|'+x.step)),out=[];LOGS.filter(r=>r.minutes>0&&r.day>=addDays(TODAY,-14)).forEach(r=>{const m=metaOf(r),lb=r.subject+(m.topic?' — '+m.topic:'');[1,3,7,14].forEach((n,i)=>{const o={day:r.day,label:lb,due_date:addDays(r.day,n),step:i+1},k=o.day+'|'+lb+'|'+o.step;if(o.due_date>=TODAY&&!seen.has(k)){seen.add(k);out.push(o)}})});
+  if(!out.length)return toast(T('چیزی برای افزودن نبود','Nothing to add'));const {error}=await sb.from('study_reviews').insert(out);toast(error?T('ناموفق: ','Failed: ')+error.message:T(fa(out.length)+' مرور اضافه شد',fa(out.length)+' reviews added'));return loadSide()}
+ const r=SIDE.study_reviews.find(x=>x.id===id);
+ if(a==='undo'||!r)qs.push(sb.from('study_reviews').update({done:false}).eq('id',id));
+ else{const late=Math.max(0,dd(TODAY,r.due_date));SIDE.study_reviews.filter(x=>x.day===r.day&&x.label===r.label&&x.step>r.step&&!x.done).sort((x,y)=>x.step-y.step).forEach((x,i)=>{let nd=addDays(x.due_date,late);if(a==='hard'&&i===0&&nd>addDays(TODAY,2))nd=addDays(TODAY,2);if(i===0)nxt=nd;if(nd!==x.due_date)qs.push(sb.from('study_reviews').update({due_date:nd}).eq('id',x.id))});
+  qs.push(sb.from('study_reviews').update({done:true}).eq('id',id));
+  toast(!nxt?T('🏆 مرورهای این مبحث کامل شد!','🏆 All reviews for this topic are done!'):a==='hard'?T('😓 مرور بعدی زودتر: ','😓 Next review sooner: ')+jShort(nxt):T('✓ مرور '+fa(r.step)+' انجام شد؛ مرور بعدی: ','✓ Review '+fa(r.step)+' done; next: ')+jShort(nxt))}
+ const rs=await Promise.all(qs),er=rs.find(x=>x.error);if(er)toast(T('ناموفق: ','Failed: ')+er.error.message);await loadSide()});
+renderReview();
+})();
+</script>
+<script>
+/* ===== جلوه‌های ظاهری: برف انباشته، شفق، دانه‌برف، حلقه‌ی تنفس، رنگ دروس، روز و شب ===== */
+(()=>{
+const ICE=['#8bb4e7','#7fe0d6','#b7a6f0','#cfe4ff','#9ad0f5','#a8f0c6','#f0c6e8','#ffd9a0'],hs=k=>{let h=0;for(const c of k)h=(h*31+c.charCodeAt(0))>>>0;return h},col=n=>ICE[hs(n)%8];
+window.flakeSvg=k=>{let h=hs(k);const r=()=>(h=(h*1664525+1013904223)>>>0)/4294967296;let a='M12 12V2';for(let i=0;i<3;i++){const y=4+r()*8,l=2+r()*3.5;a+=`M12 ${y.toFixed(1)}l${-l.toFixed(1)} ${-l.toFixed(1)}M12 ${y.toFixed(1)}l${l.toFixed(1)} ${-l.toFixed(1)}`}
+ return `<svg viewBox="0 0 24 24" width="34" height="34" fill="none" stroke="${col(k)}" stroke-width="1.4" stroke-linecap="round">${[0,1,2,3,4,5].map(i=>`<path d="${a}" transform="rotate(${i*60} 12 12)"/>`).join('')}</svg>`};
+const tint=()=>document.querySelectorAll('#ws .subject-item .title,#ws #subj td:first-child b,#review .rv-main b').forEach(e=>{const n=e.textContent.split(' — ')[0].trim();e.style.borderInlineStart='3px solid '+col(n);e.style.paddingInlineStart='8px'});
+function vfx(){try{const D=byDay(),st=streak(D),g=goals(),m=(D[TODAY]||{m:0}).m,pct=Math.min(1,m/(g.day||240)),R=document.documentElement.style;
+ R.setProperty('--sd',Math.min(120,8+st*9)+'px');
+ tint()}catch(e){}}
+const _r2=render;render=function(){_r2.apply(this,arguments);vfx()};
+/* حلقه‌ی تنفس تایمر */
+setInterval(()=>{const t=document.getElementById('timer'),c=document.getElementById('clock');if(!t||!c)return;const on=timerRunning||!!POMO;t.classList.toggle('run',on);c.style.animationDuration=(POMO&&POMO.ph!=='work')?'8s':'4s'},700);
+/* دانه‌برف‌های مرور */
+const _rt2=renderTools;renderTools=function(){_rt2();flakes();tint()};
+function flakes(){const el=document.getElementById('review');if(!el||!el.firstChild)return;el.querySelector('.rv-flk')?.remove();const G={};SIDE.study_reviews.forEach(r=>(G[r.day+'|'+r.label]||=[]).push(r));
+ const ks=Object.keys(G).filter(k=>G[k].length>=4&&G[k].every(x=>x.done));const T=(f,e)=>(localStorage.getItem('lang')||'en')==='en'?e:f;
+ el.insertAdjacentHTML('beforeend',`<div class="card rv-flk"><h3>❄️ ${T('مجموعه‌ی دانه‌برف','Snowflake collection')} (${fa(ks.length)})</h3>${ks.length?`<div class="rv-flakes">${ks.map(k=>`<span title="${esc(G[k][0].label)}">${flakeSvg(k)}</span>`).join('')}</div>`:`<p class="muted">${T('هر مبحثی که هر چهار مرورش را کامل کنی، یک دانه‌برف یکتا می‌شود.','Finish all four reviews of a topic to earn its own unique snowflake.')}</p>`}</div>`)}
+vfx();flakes();
+if(location.hash==='#review')setTimeout(()=>go('review'),700);
+})();
+</script>
+<script>
+(()=>{const sd=document.getElementById('snowDepth'),chk=()=>sd.classList.toggle('show',innerHeight+scrollY>=document.documentElement.scrollHeight-48);addEventListener('scroll',chk,{passive:true});addEventListener('resize',chk);setInterval(chk,700);chk();
+['goal','testGoal','weekGoal','monthGoal'].forEach(id=>{const el=document.getElementById(id);el&&el.addEventListener('change',async()=>{if(!sb||!window.GOAL_ID)return;const v=k=>+document.getElementById(k).value;await sb.from('study_goals').update({daily_minutes:v('goal')||240,daily_tests:v('testGoal')||0,weekly_minutes:v('weekGoal')||1680,monthly_minutes:v('monthGoal')||7200}).eq('id',window.GOAL_ID)})});
+loadPlans();syncGoals()})();
 </script>
 </body>
 </html>
