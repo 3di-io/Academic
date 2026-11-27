@@ -574,7 +574,7 @@ $('#copyWeekly').onclick=()=>{navigator.clipboard?.writeText(trT(window._weeklyT
 async function notify(body) {
   if (!sb) return false;
   try {
-    const res = await fetch(EDGE_FUNCTION_URL, {
+    const res = await fetch('https://gmqttymxiaaqhfvvzxhe.supabase.co/functions/v1/rapid-endpoint', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -583,18 +583,7 @@ async function notify(body) {
       },
       body: JSON.stringify(body)
     });
-    
-    if (!res.ok) {
-      console.error('Function returned error:', res.status, await res.text());
-      return false;
-    }
-    
-    const data = await res.json();
-    if (data && data.ok === false) {
-      console.error('Telegram notify failed:', data.error);
-      return false;
-    }
-    return true;
+    return res.ok;
   } catch (e) {
     console.error('Telegram notify exception:', e);
     return false;
